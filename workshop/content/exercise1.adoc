@@ -57,7 +57,9 @@ Ansible Rulebooks directly on the bastion host.
 Via a browser, ensure you can access the automation controller dashboard.
 
 URL: {aap_controller_web_url}
+
 username: {aap_controller_admin_user}
+
 password: {aap_controller_admin_password}
 
 == Understanding the Provided Ansible Playbook
