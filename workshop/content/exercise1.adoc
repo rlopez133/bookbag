@@ -1,14 +1,24 @@
+:bastion_ssh_user_name: %bastion_ssh_user_name%
+:bastion_public_hostname: %bastion_public_hostname%
+:aap_controller_web_url: %aap_controller_web_url%
+:aap_controller_admin_user: %aap_controller_admin_user%
+:aap_controller_admin_password: %aap_controller_admin_password%
+:aap_controller_admin_token: %aap_controller_admin_token%
+:openshift_api_url: %openshift_api_url%
+:openshift_token: %openshift_token%
+:format_cmd_exec: source,options="nowrap",,role="copy",subs="{markup-in-source}"
+
 == Introduction to Ansible Rulebooks
 
 In this exercise, you will learn how to write an Ansible Rulebook, which is a
 set of instructions that connects events to actions. You will be provided
 with an Ansible playbook that handles PVC (Persistent Volume Claim) and
-VolumeSnapshot creation. 
+VolumeSnapshot creation.
 
 Your task is to create a rulebook that triggers an Ansible Job within automation
 controller using specific event variables.
 
-== Prerequisites 
+== Prerequisites
 
 * Access to your Bastion Host Credentials
 * Access to your controller admin token
@@ -21,7 +31,7 @@ controller using specific event variables.
 
 Using the bastion host credentials, `ssh` into the host:
 
-[source,subs="attributes"]
+[{format_cmd_exec}]
 ----
 $ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
@@ -31,13 +41,14 @@ $ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 With access to the bastion host, clone the Git repository with the exercises
 for the lab. They are located under https://github.com/rlopez133/demos
 
+[{format_cmd_exec}]
 ----
 $ git clone https://github.com/rlopez133/demos
 ----
 
 [NOTE]
 ====
-All the exercises for this lab will be founder under the `demos/eda_ocp`
+All the exercises for this lab will be found under the `demos/eda_ocp`
 directory. There is a folder associated for each exercise.
 ====
 
@@ -45,6 +56,7 @@ directory. There is a folder associated for each exercise.
 
 Within the bastion host, pull the container image for the Ansible Rulebook via
 
+[{format_cmd_exec}]
 ----
 $ podman pull quay.io/ansible/ansible-rulebook:v0.12.0
 ----
@@ -66,18 +78,19 @@ password: {aap_controller_admin_password}
 
 The provided Ansible playbook, `pvc_snapshot_playbook.yml`, automates the
 process of creating a VolumeSnapshot for a newly added Persistent Volume Claim
-(PVC) in a OpenShift cluster. The playbook consists of a series of tasks,
-organized within a block and a rescue section.
+(PVC) in a OpenShift cluster. The playbook consists of a series of tasks
+ensuring the Persistent Volume Claim gets created and provides details on the
+Volume Snapshot.
 
-The block section contains four tasks:
+The Ansible playbook contains four tasks:
 
-* The first task waits for a PVC to enter the "Bound" status. It uses the `kubernetes.core.k8s_info` module to gather information about the PVC, based on the event's namespace and name. The task will keep retrying until the PVC reaches the "Bound" status or the maximum number of retries is reached.  
+* The first task waits for a PVC to enter the "Bound" status. It uses the `kubernetes.core.k8s_info` module to gather information about the PVC, based on the event's namespace and name. The task will keep retrying until the PVC reaches the "Bound" status or the maximum number of retries is reached.
 
 * The second task creates a VolumeSnapshot using the `kubernetes.core.k8s` module. This task will only execute if the PVC is in the "Bound" status.  The rescue section contains error handling and debugging tasks. If the PVC fails to reach the "Bound" status, the rescue section will be executed, providing debug information and a message that the PVC never achieved the "Bound" status.
 
 * The third task retrieves the details of a Kubernetes VolumeSnapshot resource using the `kubernetes.core.k8s_info` module.
 
-* The fourth task prints the name and namespace of each VolumeSnapshot retrieved in the previous task using the `ansible.builtin.debug` module 
+* The fourth task prints the name and namespace of each VolumeSnapshot retrieved in the previous task using the `ansible.builtin.debug` module
 
 
 .Ansible PVC Playbook
@@ -151,6 +164,7 @@ In this section, you will be provided with an example rulebook. Your task is to
 modify the example rulebook to run the Ansible Job Template
 `EDA-OpenShift-Exercise1` when a `PersistentVolumeClaim` gets created.
 
+[{format_cmd_exec}]
 .Example Rulebook
 ----
 - name: Example Rulebook
@@ -173,15 +187,18 @@ modify the example rulebook to run the Ansible Job Template
 
 Follow these steps to modify the example rulebook:
 
+. Copy the example rulebook to a file named `exercise1-rulebook.yml` within the /path/to/demos/eda_ocp/exercise1
 . Change the name of the rulebook from "Example Rulebook" to "Listen for newly added PVC resources and create a snapshot".
 . Update the `sources` section to use the appropriate source and watch for the proper Kubernetes objects. Replace `my_event_source` with the appropriate event source (`sabre1041.eda.k8s`). Replace `SomeResource` with `PersistentVolumeClaim`.
++
+WARNING: The values are cap-sensitive. Ensure proper capitalization of `PersistentVolumeClaim`
 +
 [NOTE]
 ====
 The event source _sabre1041.eda.k8s_ is a source module that enables the
 consumption of changes originating from an OpenShift cluster which can then be
 used to trigger automation to respond and act based on the received content and
-configured rules.  
+configured rules.
 ====
 +
 . Modify the rule named "Perform Action" to "Create Snapshot". Update the condition to create a snapshot when a Persistent Volume Claim is created via `event.type == "ADDED"`
@@ -233,10 +250,10 @@ REPOSITORY                        TAG         IMAGE ID      CREATED      SIZE
 quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 ----
 +
-. Start the ansible-rulebook container and access it. 
+. Start the ansible-rulebook container and access it.
 +
 ----
-$ podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 ddab79939a21 /bin/bash
+$ podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 <IMAGE_ID> /bin/bash
 ----
 +
 . Within the ansible-rulebook container, run the `setup.sh`
@@ -250,7 +267,7 @@ $ podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 ddab79939a21 /b
 This installs pip packages `kubernetes`, `requests` and installs the
 `sabre1041.eda` collection required for our Ansible Rulebook and Ansible
 Playbook. It also installs the `oc` binary required to interactive with our
-OpenShift cluster. 
+OpenShift cluster.
 ====
 +
 . Login to your OpenShift cluster via
@@ -262,14 +279,18 @@ $ oc login --token={openshift_token} --server={openshift_api_url}
 +
 . Change to the `exercise_1` directory
 +
+[{format_cmd_exec}]
 ----
 $ cd /mnt/exercise_1
 ----
-. Run the Ansible Rulebook
+. Run your Ansible Rulebook (`exercise1-rulebook.yml`) with your AAP controller credentials
++
+[{format_cmd_exec}]
+----
+$ ansible-rulebook -i inventory --rulebook exercise1-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_admin_token}
+----
 +
 ----
-$ ansible-rulebook -i inventory --rulebook pvc_snapshot_rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_admin_token}
-
 (app-root) (app-root) oc project default
 Now using project "default" on server "https://api.cluster-8pqpx.8pqpx.sandbox2254.opentlc.com:6443".
 (app-root) (app-root) ansible-rulebook -i inventory --rulebook pvc_snapshot_rulebook.yml --verbose
@@ -293,14 +314,14 @@ Claim is created.
 
 . Open a new terminal window and ssh into the bastion host.
 +
-[source,subs="attributes"]
+[{format_cmd_exec}]
 ----
 $ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 +
 . Login using your token within this new terminal window.
 +
-[source,subs="attributes"]
+[{format_cmd_exec}]
 ----
 $ oc login --token={openshift_token} --server={openshift_api_url}
 ----
@@ -313,12 +334,14 @@ $ cd /path/to/demos/eda_ocp/exercise_1
 +
 . Create a namespace to host the RocketChat app
 +
+[{format_cmd_exec}]
 ----
 $ oc project rocketchat
 ----
 +
 . Install the RocketChat App via the `app.yml` file
 +
+[{format_cmd_exec}]
 ----
 $ oc create -f app.yml
 ----
@@ -333,8 +356,9 @@ $ oc create -f app.yml
 2023-04-26 19:05:21,598 - ansible_rulebook.builtin - INFO - ruleset: Listen for newly added PVC resources and create a snapshot, rule Create Snapshot
 ----
 +
-. Once you see the Ansible Playbook has completed, verify the snapshot has been created. 
+. Once you see the Ansible Playbook has completed, verify the snapshot has been created.
 +
+[{format_cmd_exec}]
 ----
 $ oc get volumesnapshot -n rocketchata
 
@@ -342,11 +366,11 @@ NAME                             READYTOUSE   SOURCEPVC               SOURCESNAP
 rocketchat-data-claim-snapshot-2023-04-26   true         rocketchat-data-claim                           10Gi          csi-aws-vsc     snapcontent-9db8e7f3-0d30-4777-8355-465b76d74de5   3h17m          3h17m
 ----
 +
-. Congratulations! You now have completed Exercise 1 of creating a PVC Snapshot upon application creation. 
+. Congratulations! You now have completed Exercise 1 of creating a PVC Snapshot upon application creation.
 
 == Expanding on this exercise
 
-What else could you do with this Ansible Rulebook? 
+What else could you do with this Ansible Rulebook?
 
 One idea could be to add a scheduler to the PVC creation process where the
 Ansible Playbook runs daily, weekly, monthly based on your compliance
@@ -362,6 +386,10 @@ To remove:
 
 ----
 $ cd /path/to/eda_ocp/exercise_1
+----
 
+
+[{format_cmd_exec}]
+----
 $ oc delete -f app.yml
 ----
