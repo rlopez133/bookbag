@@ -181,8 +181,8 @@ modify the example rulebook to run the Ansible Job Template
           name: Example-Job-Template
           organization: Default
           job_args:
-          extra_vars:
-            event: "{{ event }}"
+            extra_vars:
+              event: "{{ event }}"
 ----
 
 Follow these steps to modify the example rulebook:
