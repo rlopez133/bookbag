@@ -1,14 +1,381 @@
-:guid: %guid%
-:user: %user%
-:markup-in-source: verbatim,attributes,quotes
+:bastion_ssh_user_name: %bastion_ssh_user_name%
+:bastion_public_hostname: %bastion_public_hostname%
+:aap_controller_web_url: %aap_controller_web_url%
+:aap_controller_admin_user: %aap_controller_admin_user%
+:aap_controller_admin_password: %aap_controller_admin_password%
+:aap_controller_admin_token: %aap_controller_admin_token%
+:openshift_api_url: %openshift_api_url%
+:openshift_token: %openshift_token%
+:format_cmd_exec: source,options="nowrap",,role="copy",subs="{markup-in-source}"
 
-== Exercise 2
+== Configuring SSL Management with Ansible Rulebooks
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Nam quam arcu, accumsan eget ligula sed, aliquet vehicula felis.
-Aliquam aliquam pellentesque fringilla.
-Nam porttitor, orci vel cursus ultrices, diam dolor maximus metus, eget elementum felis ante vitae ex.
-Mauris ligula eros, venenatis eu tincidunt eu, pulvinar vitae lectus.
-Aliquam facilisis lectus viverra vestibulum ornare.
-Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
-Etiam accumsan efficitur sapien.
+In this exercise, you will create an Ansible Rulebook that triggers an Ansible
+Job within Automation Controller when a Route to an OpenShift application is
+created.
+
+You will work with an Ansible playbook that performs the following tasks:
+
+* Creates an Issuer 
+* Generates a Certificate 
+* Patches your application's OpenShift
+Route with a properly signed SSL certificate 
+
+Your objective is to develop an Ansible Rulebook that activates this Ansible
+playbook through an Ansible Job within the Automation Controller.
+
+
+== Prerequisites
+
+* Access to your Bastion Host Credentials
+* Access to your controller admin token
+* Access to the automation controller dashboard
+* SSH capabilities to the Bastion Host via terminal
+* Access to the Git repository, demos, with the exercises
+* Installation of the Ansible Rulebook container image via `podman`
+
+NOTE: The prerequisites details can all be found within the Overview section.
+
+== Understanding the Provided Ansible Playbook
+
+This Ansible playbook is specifically designed to configure an application in
+OpenShift with Cert Manager, leveraging the capabilities of both the
+Cert-Manager Operator and the Cert-Utils Operator. It employs Let's Encrypt, a
+well-respected Certificate Authority, to acquire a properly signed SSL
+certificate. Let's Encrypt has gained widespread popularity due to its provision
+of free SSL certificates and the automation it offers for obtaining, renewing,
+and managing these certificates.
+
+The Cert-Manager Operator plays a crucial role in overseeing the entire
+lifecycle of SSL certificates within Kubernetes and OpenShift environments. In
+conjunction with the Cert-Manager Operator, the Cert-Utils Operator is
+responsible for automatically patching the TLS certificate and key onto the
+Route whenever it is triggered by an event being watched by the Ansible
+Rulebook.
+
+The following is a breakdown of the tasks being performed by the Ansible playbook:
+
+. *Define variables:* The playbook starts by defining various variables required for the configuration process. These include the issuer's name (Let's Encrypt), namespace, email, certificate name, namespace, DNS names, secret name, route name, and route namespace.
+. *Create Issuer:* The first task in the playbook is to create an Issuer using the `kubernetes.core.k8s` module. An Issuer is a cert-manager resource responsible for issuing certificates. In this case, the Issuer is configured to use the Let's Encrypt ACME server to obtain SSL certificates.
+. *Create Certificate:* The second task creates a Certificate resource, which requests an SSL certificate from the previously created Issuer (Let's Encrypt). It specifies the required DNS names, issuer reference, and private key settings.
+. *Patch Route with Cert Manager Annotations:* The final task patches the OpenShift Route with Cert Manager annotations using the `kubernetes.core.k8s` module. This step ensures that the Route is updated with the newly created SSL certificate and its associated metadata. The `cert-utils-operator.redhat-cop.io/certs-from-secret` annotation is particularly important, as it tells the Cert-Utils Operator to watch the specified secret and automatically patch the TLS certificate and key to the Route when it's updated.
+
+.Ansible SSL Management Playbook
+----
+---
+- name: Configure app with Cert Manager
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    issuer_name: letsencrypt
+    issuer_namespace: "{{ ansible_eda.event.resource.metadata.namespace }}"
+    issuer_email: contact@foobar.io
+    cert_name: "{{ ansible_eda.event.resource.metadata.name }}-auth-cert"
+    cert_namespace: "{{ ansible_eda.event.resource.metadata.namespace }}"
+    cert_dnsNames:
+      - "{{ ansible_eda.event.resource.spec.host }}"
+    cert_secretName: "{{ ansible_eda.event.resource.metadata.name }}-auth-cert"
+    route_name: "{{ ansible_eda.event.resource.metadata.name }}"
+    route_namespace: "{{ ansible_eda.event.resource.metadata.namespace }}"
+  tasks:
+    - name: Create Issuer
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: cert-manager.io/v1
+          kind: Issuer
+          metadata:
+            name: "{{ issuer_name }}"
+            namespace: "{{ issuer_namespace }}"
+          spec:
+            acme:
+              email: "{{ issuer_email }}"
+              preferredChain: ''
+              privateKeySecretRef:
+                name: "{{ issuer_name }}-key"
+              server: 'https://acme-v02.api.letsencrypt.org/directory'
+              solvers:
+                - http01:
+                    ingress: {}
+
+    - name: Create Certificate
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: cert-manager.io/v1
+          kind: Certificate
+          metadata:
+            name: "{{ cert_name }}"
+            namespace: "{{ cert_namespace }}"
+          spec:
+            dnsNames: "{{ cert_dnsNames }}"
+            duration: 2160h0m0s
+            issuerRef:
+              kind: Issuer
+              name: "{{ issuer_name }}"
+            privateKey:
+              algorithm: RSA
+              encoding: PKCS1
+              size: 2048
+            renewBefore: 360h0m0s
+            secretName: "{{ cert_secretName }}"
+
+    - name: Patch Route with Cert Manager Annotations
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          kind: Route
+          apiVersion: route.openshift.io/v1
+          metadata:
+            name: "{{ route_name }}"
+            namespace: "{{ route_namespace }}"
+            annotations:
+              cert-manager.io/alt-names: "{{ cert_dnsNames[0] }}"
+              cert-manager.io/certificate-name: "{{ cert_name }}"
+              cert-manager.io/common-name: "{{ cert_dnsNames[0] }}"
+              cert-manager.io/issuer: "{{ issuer_name }}"
+              cert-manager.io/issuer-kind: Issuer
+              cert-manager.io/issuer-name: "{{ issuer_name }}"
+              cert-utils-operator.redhat-cop.io/certs-from-secret: "{{ cert_secretName }}"
+          spec:
+            host: "{{ cert_dnsNames[0] }}"
+            to:
+              kind: Service
+              name: "{{ route_name }}"
+              weight: 100
+            port:
+              targetPort: "{{ ansible_eda.event.resource.spec.port.targetPort }}"
+            tls:
+              termination: edge
+              insecureEdgeTerminationPolicy: Redirect
+            wildcardPolicy: "{{ ansible_eda.event.resource.spec.wildcardPolicy }}"
+----
+
+== Writing the Ansible Rulebook
+
+In this section, you will be provided with an example rulebook. Your task is to
+modify the example rulebook to run the Ansible Job Template
+`EDA-OpenShift-Exercise2` when a `Route` gets created.
+
+[{format_cmd_exec}]
+.Example Rulebook
+----
+- name: Example Rulebook
+  hosts: all
+  sources:
+    - my_event_source:
+        api_version: v1
+        kind: SomeResource
+  rules:
+    - name: Perform Action
+      condition: event.type == "SOME_EVENT"
+      action:
+        run_job_template:
+          name: Example-Job-Template
+          organization: Default
+----
+
+Follow these steps to modify the example rulebook:
+
+. Copy the example rulebook to a file named `exercise2-rulebook.yml` within the /path/to/demos/eda_ocp/exercise2
+. Change the name of the rulebook from "Example Rulebook" to "Listen for newly created Route".
+. Update the `sources` section to use the appropriate source and watch for the proper Kubernetes objects. Replace `my_event_source` with the appropriate event source (`sabre1041.eda.k8s`). Replace `SomeResource` with `Route`.
++
+WARNING: The values are cap-sensitive. Ensure proper capitalization of `Route`
++
+[NOTE]
+====
+The event source _sabre1041.eda.k8s_ is a source module that enables the
+consumption of changes originating from an OpenShift cluster which can then be
+used to trigger automation to respond and act based on the received content and
+configured rules.
+====
++
+. Modify the rule named "Perform Action" to "Patch a Route". Update the condition to patch a route when a Route is created via `event.type == "ADDED"`
+. Change the name of the run_job_template from `Example-Job-Template` to `EDA-OpenShift-Exercise2`
+
+=== Solution
+
+.*Click to see solution*
+[%collapsible]
+====
+[,yaml]
+----
+- name: Listen for newly created Routes
+  hosts: all
+  sources:
+    - sabre1041.eda.k8s:
+        api_version: v1
+        kind: Route
+  rules:
+    - name: Patch a Route
+      condition: event.type == "ADDED"
+      action:
+        run_job_template:
+          name: EDA-OpenShift-Exercise2
+          organization: Default
+----
+====
+
+==  Run the Ansible Rulebook
+
+In order to run the Ansible Rulebook we will take advantage of the existing
+quay.io Ansible Rulebook image that was pulled with in the prerequisites section
+and make some slight modifications within the container.
+
+. As the `lab-user` within your bastion host, change directory to the Git repository demos folder
++
+----
+$ cd /path/to/demos/eda_ocp/
+----
++
+. Capture the image ID of the Ansible Rulebook image
++
+----
+$ podman images
+REPOSITORY                        TAG         IMAGE ID      CREATED      SIZE
+quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
+----
++
+. Start the ansible-rulebook container and access it.
++
+----
+$ podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 <IMAGE_ID> /bin/bash
+----
++
+. Within the ansible-rulebook container, run the `setup.sh`
++
+----
+(app-root) (app-root) ./setup.sh
+----
++
+[NOTE]
+====
+This installs pip packages `kubernetes`, `requests` and installs the
+`sabre1041.eda` collection required for our Ansible Rulebook and Ansible
+Playbook. It also installs the `oc` binary required to interactive with our
+OpenShift cluster.
+====
++
+. Login to your OpenShift cluster via
++
+[{format_cmd_exec}]
+----
+$ oc login --token={openshift_token} --server={openshift_api_url}
+----
++
+. Change to the `exercise_2` directory
++
+[{format_cmd_exec}]
+----
+$ cd /mnt/exercise_2
+----
+. Run your Ansible Rulebook (`exercise1-rulebook.yml`) with your AAP controller credentials
++
+[{format_cmd_exec}]
+----
+$ ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_admin_token}
+----
++
+----
+(app-root) (app-root) oc project default
+Now using project "default" on server "https://api.cluster-8pqpx.8pqpx.sandbox2254.opentlc.com:6443".
+(app-root) (app-root) ansible-rulebook -i inventory --rulebook pvc_snapshot_rulebook.yml --verbose
+2023-04-25 16:13:19,351 - ansible_rulebook.app - INFO - Starting sources
+2023-04-25 16:13:19,351 - ansible_rulebook.app - INFO - Starting rules
+2023-04-25 16:13:19,351 - ansible_rulebook.engine - INFO - run_ruleset
+2023-04-25 16:13:19,352 - drools.ruleset - INFO - Using jar: /opt/app-root/lib/python3.9/site-packages/drools/jars/drools-ansible-rulebook-integration-runtime-1.0.0-SNAPSHOT.jar
+2023-04-25 16:13:20,269 - ansible_rulebook.engine - INFO - ruleset define: {"name": "Listen for newly added PVC resources and create a snapshot", "hosts": ["all"], "sources": [{"EventSource": {"name": "sabre1041.eda.k8s", "source_name": "sabre1041.eda.k8s", "source_args": {"api_version": "v1", "kind": "PersistentVolumeClaim"}, "source_filters": []}}], "rules": [{"Rule": {"name": "Create Snapshot", "condition": {"AllCondition": [{"EqualsExpression": {"lhs": {"Event": "type"}, "rhs": {"String": "ADDED"}}}]}, "actions": [{"Action": {"action": "run_playbook", "action_args": {"name": "pvc_snapshot_playbook.yml", "extra_vars": {"event": "{{ event }}"}}}}], "enabled": true}}]}
+2023-04-25 16:13:20,291 - ansible_rulebook.engine - INFO - load source
+2023-04-25 16:13:21,295 - ansible_rulebook.engine - INFO - load source filters
+2023-04-25 16:13:21,295 - ansible_rulebook.engine - INFO - loading eda.builtin.insert_meta_info
+2023-04-25 16:13:21,996 - ansible_rulebook.engine - INFO - Calling main in sabre1041.eda.k8s
+2023-04-25 16:13:21,996 - root - INFO - Running k8s eda source
+----
+
+== Create the RocketChat App
+
+With our Ansible Rulebook watching for an event, we will now create an
+application that will trigger the Ansible Rulebook once a Persistent Volume
+Claim is created.
+
+. Open a new terminal window and ssh into the bastion host.
++
+[{format_cmd_exec}]
+----
+$ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+----
++
+. Login using your token within this new terminal window.
++
+[{format_cmd_exec}]
+----
+$ oc login --token={openshift_token} --server={openshift_api_url}
+----
++
+. Within the Git repository, access the /path/to/demos/eda_ocp/exercise_1 directory.
++
+----
+$ cd /path/to/demos/eda_ocp/exercise_1
+----
++
+. Create a namespace to host the RocketChat app
++
+[{format_cmd_exec}]
+----
+$ oc project rocketchat
+----
++
+. Install the RocketChat App via the `app.yml` file
++
+[{format_cmd_exec}]
+----
+$ oc create -f app.yml
+----
++
+. Once the PVC is bound to the application, this will trigger the Ansible Rulebook to run the Ansible Job `EDA-OpenShift-Exercise1` that will create a snapshot of the PVC.
++
+. Looking at the terminal with the Ansible Rulebook container running you will see output similar to:
++
+----
+...
+2023-04-26 19:05:21,598 - ansible_rulebook.builtin - INFO - running job template: EDA-OpenShift-Exercise1, organization: Default
+2023-04-26 19:05:21,598 - ansible_rulebook.builtin - INFO - ruleset: Listen for newly added PVC resources and create a snapshot, rule Create Snapshot
+----
++
+. Once you see the Ansible Playbook has completed, verify the snapshot has been created.
++
+[{format_cmd_exec}]
+----
+$ oc get volumesnapshot -n rocketchat
+
+NAME                             READYTOUSE   SOURCEPVC               SOURCESNAPSHOTCONTENT   RESTORESIZE   SNAPSHOTCLASS   SNAPSHOTCONTENT                                    CREATIONTIME   AGE
+rocketchat-data-claim-snapshot-2023-04-26   true         rocketchat-data-claim                           10Gi          csi-aws-vsc     snapcontent-9db8e7f3-0d30-4777-8355-465b76d74de5   3h17m          3h17m
+----
++
+. Congratulations! You now have completed Exercise 1 of creating a PVC Snapshot upon application creation.
+
+== Expanding on this exercise
+
+What else could you do with this Ansible Rulebook?
+
+One idea could be to add a scheduler to the PVC creation process where the
+Ansible Playbook runs daily, weekly, monthly based on your compliance
+requirements for your snapshots.
+
+
+== Cleanup RocketChat App
+
+As we will be using the RocketChat App for the next exercise, lets remove it as
+we will be using it to trigger our next event relating SSL management.
+
+To remove:
+
+----
+$ cd /path/to/eda_ocp/exercise_1
+----
+
+
+[{format_cmd_exec}]
+----
+$ oc delete -f app.yml
+----
