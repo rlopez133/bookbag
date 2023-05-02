@@ -354,7 +354,7 @@ $ oc create -f app.yml
 +
 [{format_cmd_exec}]
 ----
-$ oc get volumesnapshot -n rocketchata
+$ oc get volumesnapshot -n rocketchat
 
 NAME                             READYTOUSE   SOURCEPVC               SOURCESNAPSHOTCONTENT   RESTORESIZE   SNAPSHOTCLASS   SNAPSHOTCONTENT                                    CREATIONTIME   AGE
 rocketchat-data-claim-snapshot-2023-04-26   true         rocketchat-data-claim                           10Gi          csi-aws-vsc     snapcontent-9db8e7f3-0d30-4777-8355-465b76d74de5   3h17m          3h17m
