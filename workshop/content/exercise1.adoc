@@ -221,7 +221,7 @@ Follow these steps to modify the example rulebook:
 Using the `vi` editor, to ensure that the formating of the pasted content is
 preserved, enter command mode by pressing the `Esc` key and type the following
 `:set paste` followed by enter. Then insert the content at the current cursor
-position by pression the `i` key to enter insert mode.
+position by pressing the `i` key to enter insert mode.
 ====
 +
 . Change the name of the rulebook from `Example Rulebook` to `Monitor for new PVCs and create snapshots`
@@ -385,7 +385,7 @@ cd /home/lab-user/demos/eda_ocp/exercise_1
 +
 [{format_cmd_exec}]
 ----
-oc project rocketchat
+oc new-project rocketchat
 ----
 +
 . Install the RocketChat App via the `app.yml` file within the exercise_1 directory.
