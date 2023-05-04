@@ -4,51 +4,85 @@
 :markup-in-source: verbatim,attributes,quotes
 :my_deep_var_underbars: {my_deep_var}
 :my_deep_var_dots: {my.deep.var}
+:bookbag-link: https://bookbag-{guid}-bookbag.apps.shared-410.openshift.redhatworkshops.io
 
-== Overview
+== Ansible Automation Platfrom 2 EDA on OpenShift
 
-You can access environment variables as flattened `{}`-surrounded variables in these templated AsciiDoc files.
+Welcome to the Ansible Automation Platform 2 EDA on OpenShift Lab. In this lab,
+you will learn how to create and use Ansible Rulebooks that can trigger events
+within an OpenShift environment. 
 
-=== Variables from ENV as AsciiDoc attributes
+Exercise 1 will focus on how to create Volume Snapshots when a Persistent Volume
+Claim is created by an application.
 
-NOTE: JSON objects are flattened and joined with a `.`.
-As a side-effect of the `.`, any character will match the `.` in the variable name.
+Exercise 2 will focus on SSL Management and how to use Let's Encrypt
+Certificates to an OpenShift application when it is created.
 
-.Example: All of these function
-----
-:my_deep_var_underbars: {my_deep_var}
-:my_deep_var_dots: {my.deep.var}
+Exercise 3 will focus on setting resource quotas when a new namespace is
+created. This is important in scenarios where an OpenShift cluster is shared
+across an organization and you want to ensure not one specific team over
+consumes resources. 
 
-:my_deep_var_underbars: {my_deep_var_underbars}
-:my_deep_var_dots: {my_deep_var_dots}
 
-:my_deep_var_underbars: {my_deep_var}
-:my_deep_var_dots: {my.deep.var}
-----
+Welcome to the Ansible Automation Platform 2 Event Driven Ansible (EDA) on
+OpenShift Lab. This comprehensive lab experience is designed to provide you with
+an understanding of the capabilities of Ansible Rulebooks in the context of an
+OpenShift environment.
 
-== Intro
+The lab is divided into three key exercises, each focusing on a specific aspect
+of EDA within an OpenShift environment.
 
-In this workshop, you will... to be completed by the workshop developer.
-The following content is an example of what to include in an overview.
+Exercise 1: Persistent Volume Snapshots Management - In this exercise,
+participants will learn the process of automatically creating Volume Snapshots
+when a Persistent Volume Claim is created by an application. This section
+provides a detailed overview of the interaction between Ansible Rulebooks and
+how watching for specific events can trigger an Automation Job to create the
+generation of Volume Snapshots.
 
-=== Lab Access
+Exercise 2: SSL Management and Let's Encrypt Certificates Integration - This
+exercise delves into SSL Management and demonstrates the practical application
+of integrating Let's Encrypt Certificates with OpenShift applications upon their
+creation. Participants will gain insights into enhancing the security of their
+applications through the effective use of SSL certificates.
 
-You can access your lab environment as {user} with password "{ssh_password}" with the following command:
+Exercise 3: Resource Quota Allocation in a Shared OpenShift Environment - The
+final exercise emphasizes the importance of resource management in scenarios
+where an OpenShift cluster is shared across an organization. Participants will
+learn how to set resource quotas when creating a new namespace, ensuring that
+resources are fairly distributed and not over-consumed by any specific team.
 
-[source,bash,options="nowrap",subs="{markup-in-source}"]
-----
-{ssh_command}
-----
 
-Your lab GUID is "{guid}".
+===  Automation Controller Credentials and URL
 
-An example var was set to {example_var}.
+You can access the Automation Controller web console at:
 
-=== Workshop Information
+[%autowidth.stretch,width=70%,cols="^.^a,^.^a",options="header"]
+|===
+| *Controller Console URL:* | {aap_controller_web_url}
+| *Admin Username:* | {aap_controller_admin_user}
+| *Admin Password:* | {aap_controller_admin_password}
+| *Controller Token:* | {aap_controller_token}
+|===
 
-Informational messages generated for your workshop:
+===  Bastion Host Credentials
 
-[source,bash,options="nowrap"]
-----
-{user_info_messages}
-----
+A RHEL bastion host is available with common utilities pre-installed and
+OpenShift command line access pre-configured.
+
+[%autowidth.stretch,width=70%,cols="^.^a,^.^a",options="header"]
+|===
+| *SSH Command:*  | ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+| *SSH Password:* | {bastion_ssh_password}
+|===
+
+=== OpenShift Access
+
+
+[%autowidth.stretch,width=70%,cols="^.^a,^.^a",options="header"]
+|===
+| *OpenShift Console URL:* | {openshift_console_url}
+| *Admin Username:* | kubeadmin
+| *Admin Password:* | {openshift_kubeadmin_password}
+| *OpenShift Token:* | {openshift_bearer_token}
+|===
+
