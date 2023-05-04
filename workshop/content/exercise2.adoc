@@ -11,7 +11,7 @@
 == Configuring SSL Management with Ansible Rulebooks
 
 In this exercise, you will create an Ansible Rulebook that triggers an Ansible
-Job within Automation Controller when a Route to an OpenShift application is
+Job within automation controller when a Route to an OpenShift application is
 created.
 
 You will work with an Ansible playbook that performs the following tasks:
@@ -22,7 +22,7 @@ You will work with an Ansible playbook that performs the following tasks:
 Route with a properly signed SSL certificate 
 
 Your objective is to develop an Ansible Rulebook that activates this Ansible
-playbook through an Ansible Job within the Automation Controller.
+playbook through an Ansible Job within the automation controller.
 
 
 == Prerequisites
@@ -31,20 +31,18 @@ playbook through an Ansible Job within the Automation Controller.
 * Access to your controller admin token
 * Access to the automation controller dashboard
 * SSH capabilities to the Bastion Host via terminal
-* Access to the Git repository, demos, with the exercises
-* Installation of the Ansible Rulebook container image via `podman`
 
 NOTE: The prerequisites details can all be found within the Overview section.
 
 == Understanding the Provided Ansible Playbook
 
-This Ansible playbook is specifically designed to configure an application in
-OpenShift with Cert Manager, leveraging the capabilities of both the
-Cert-Manager Operator and the Cert-Utils Operator. It employs Let's Encrypt, a
-well-respected Certificate Authority, to acquire a properly signed SSL
-certificate. Let's Encrypt has gained widespread popularity due to its provision
-of free SSL certificates and the automation it offers for obtaining, renewing,
-and managing these certificates.
+This Ansible playbook is specifically designed to configure a Lets Encrypt
+certificate and apply it to an application in OpenShift leveraging the
+capabilities of both the Cert-Manager Operator and the Cert-Utils Operator. It
+employs Let's Encrypt, a well-respected Certificate Authority, to acquire a
+properly signed SSL certificate. Let's Encrypt has gained widespread popularity
+due to its provision of free SSL certificates and the automation it offers for
+obtaining, renewing, and managing these certificates.
 
 The Cert-Manager Operator plays a crucial role in overseeing the entire
 lifecycle of SSL certificates within Kubernetes and OpenShift environments. In
@@ -176,8 +174,17 @@ modify the example rulebook to run the Ansible Job Template
 
 Follow these steps to modify the example rulebook:
 
-. Copy the example rulebook to a file named `exercise2-rulebook.yml` within the /path/to/demos/eda_ocp/exercise2
-. Change the name of the rulebook from "Example Rulebook" to "Listen for newly created Route".
+. Copy the example rulebook to a file named `exercise2-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_2` directory.
++
+[NOTE]
+====
+Using the `vi` editor, to ensure that the formating of the pasted content is
+preserved, enter command mode by pressing the `Esc` key and type the following
+`:set paste` followed by enter. Then insert the content at the current cursor
+position by pressing the `i` key to enter insert mode.
+====
++
+. Change the name of the rulebook from `Example Rulebook` to `Listen for newly created Route`.
 . Update the `sources` section to use the appropriate source and watch for the proper Kubernetes objects. Replace `my_event_source` with the appropriate event source (`sabre1041.eda.k8s`). Replace `SomeResource` with `Route`.
 +
 WARNING: The values are cap-sensitive. Ensure proper capitalization of `Route`
@@ -190,8 +197,10 @@ used to trigger automation to respond and act based on the received content and
 configured rules.
 ====
 +
-. Modify the rule named "Perform Action" to "Patch a Route". Update the condition to patch a route when a Route is created via `event.type == "ADDED"`
+. Modify the rule named `Perform Action` to `Patch a Route`. Update the condition to patch a route when a Route is created via `event.type == "ADDED"`
 . Change the name of the run_job_template from `Example-Job-Template` to `EDA-OpenShift-Exercise2`
+
+WARNING: Ensure that your job template name matches `EDA-OpenShift-Exercise2`
 
 === Solution
 
@@ -219,13 +228,21 @@ configured rules.
 ==  Run the Ansible Rulebook
 
 In order to run the Ansible Rulebook we will take advantage of the existing
-quay.io Ansible Rulebook image that was pulled with in the prerequisites section
-and make some slight modifications within the container.
+quay.io Ansible Rulebook image that was pulled in the previous exercise.
+
+[NOTE]
+====
+Within the top terminal window, if you are still connected to the bastion host
+and within the Ansible Rulebook container, `Ctrl-C` to stop the Ansible Rulebook
+command running from Exercise 1. Steps 1-5 may be skipped.
+
+Otherwise continue with the steps as provided to create a new container.
+====
 
 . As the `lab-user` within your bastion host, change directory to the Git repository demos folder
 +
 ----
-$ cd /path/to/demos/eda_ocp/
+$ cd /home/lab-user/demos/eda_ocp/
 ----
 +
 . Capture the image ID of the Ansible Rulebook image
@@ -269,7 +286,7 @@ $ oc login --token={openshift_token} --server={openshift_api_url}
 ----
 $ cd /mnt/exercise_2
 ----
-. Run your Ansible Rulebook (`exercise1-rulebook.yml`) with your AAP controller credentials
+. Run your Ansible Rulebook (`exercise2-rulebook.yml`) with your Ansible automation controller credentials
 +
 [{format_cmd_exec}]
 ----
@@ -278,8 +295,6 @@ $ ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --co
 +
 ----
 (app-root) (app-root) oc project default
-Now using project "default" on server "https://api.cluster-8pqpx.8pqpx.sandbox2254.opentlc.com:6443".
-(app-root) (app-root) ansible-rulebook -i inventory --rulebook pvc_snapshot_rulebook.yml --verbose
 2023-04-25 16:13:19,351 - ansible_rulebook.app - INFO - Starting sources
 2023-04-25 16:13:19,351 - ansible_rulebook.app - INFO - Starting rules
 2023-04-25 16:13:19,351 - ansible_rulebook.engine - INFO - run_ruleset
@@ -294,47 +309,53 @@ Now using project "default" on server "https://api.cluster-8pqpx.8pqpx.sandbox22
 
 == Create the RocketChat App
 
-With our Ansible Rulebook watching for an event, we will now create an
-application that will trigger the Ansible Rulebook once a Persistent Volume
-Claim is created.
+With our Ansible Rulebook watching for an event, we will now create the Rocket
+Chat application that will trigger the Ansible Rulebook once a Route is created.
 
-. Open a new terminal window and ssh into the bastion host.
+[NOTE]
+====
+If your bottom terminal window is already logged into the bastion host, steps
+1-2 may be skipped.
+====
+
+. Within the bottom terminal window, ssh into the bastion host.
 +
 [{format_cmd_exec}]
 ----
-$ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 +
 . Login using your token within this new terminal window.
 +
 [{format_cmd_exec}]
 ----
-$ oc login --token={openshift_token} --server={openshift_api_url}
+oc login --token={openshift_token} --server={openshift_api_url}
 ----
 +
-. Within the Git repository, access the /path/to/demos/eda_ocp/exercise_1 directory.
-+
-----
-$ cd /path/to/demos/eda_ocp/exercise_1
-----
-+
-. Create a namespace to host the RocketChat app
+. Within the Git repository, access the `/home/lab-user/demos/eda_ocp/exercise_2` directory.
 +
 [{format_cmd_exec}]
 ----
-$ oc project rocketchat
+cd /home/lab-user/demos/eda_ocp/exercise_2
+----
++
+. Switch to the rocketchat namespace previously created.
++
+[{format_cmd_exec}]
+----
+oc project rocketchat
 ----
 +
 . Install the RocketChat App via the `app.yml` file
 +
 [{format_cmd_exec}]
 ----
-$ oc create -f app.yml
+oc create -f app.yml
 ----
 +
-. Once the PVC is bound to the application, this will trigger the Ansible Rulebook to run the Ansible Job `EDA-OpenShift-Exercise1` that will create a snapshot of the PVC.
+. Once the Route is created for the Rocket Chat application, this will trigger the Ansible Rulebook to run the Ansible Job `EDA-OpenShift-Exercise2` that will patch the Route with the Lets Encrypt certificate.
 +
-. Looking at the terminal with the Ansible Rulebook container running you will see output similar to:
+. Looking at the top terminal window with the Ansible Rulebook container running you will see output similar to:
 +
 ----
 ...
@@ -342,40 +363,28 @@ $ oc create -f app.yml
 2023-04-26 19:05:21,598 - ansible_rulebook.builtin - INFO - ruleset: Listen for newly added PVC resources and create a snapshot, rule Create Snapshot
 ----
 +
-. Once you see the Ansible Playbook has completed, verify the snapshot has been created.
+. Head toward your browser with the Ansible Automation Platform dashboard and login (if not already). Within the dashboard, select `Views->Jobs` and you will see the `EDA-OpenShift-Exercise2` job is launched and running.
++
+. Once you see the Ansible Job has completed successfully, verify the Route
+contains the Let's Encrypt certificate.
 +
 [{format_cmd_exec}]
 ----
-$ oc get volumesnapshot -n rocketchat
-
-NAME                             READYTOUSE   SOURCEPVC               SOURCESNAPSHOTCONTENT   RESTORESIZE   SNAPSHOTCLASS   SNAPSHOTCONTENT                                    CREATIONTIME   AGE
-rocketchat-data-claim-snapshot-2023-04-26   true         rocketchat-data-claim                           10Gi          csi-aws-vsc     snapcontent-9db8e7f3-0d30-4777-8355-465b76d74de5   3h17m          3h17m
+$ oc get routes
 ----
 +
-. Congratulations! You now have completed Exercise 1 of creating a PVC Snapshot upon application creation.
+. Using the Route URL, head to your browser and copy paste the link provided. You should now notice the Rocket Chat application has a proper SSL certificate which can be identified with the lock icon.
++
+. Congratulations! You now have completed Exercise 2 of applying properly signed certificates to applications created within OpenShift.
 
-== Expanding on this exercise
+== Summary
 
-What else could you do with this Ansible Rulebook?
+In this exercise, you learned how to automatically configure a Let's Encrypt SSL
+certificate for OpenShift Routes using Ansible Automation Platform.
 
-One idea could be to add a scheduler to the PVC creation process where the
-Ansible Playbook runs daily, weekly, monthly based on your compliance
-requirements for your snapshots.
+You learned how to:
 
-
-== Cleanup RocketChat App
-
-As we will be using the RocketChat App for the next exercise, lets remove it as
-we will be using it to trigger our next event relating SSL management.
-
-To remove:
-
-----
-$ cd /path/to/eda_ocp/exercise_1
-----
-
-
-[{format_cmd_exec}]
-----
-$ oc delete -f app.yml
-----
+. Write an Ansible Rulebook that listens for newly created Routes and patches them with SSL certificates when triggered.
+. Understand the provided Ansible playbook, which leverages Cert-Manager Operator and Cert-Utils Operator to configure a Let's Encrypt certificate for an OpenShift application.
+. Run the Ansible Rulebook using the quay.io Ansible Rulebook image.
+. Verify that the Route contains the Let's Encrypt certificate and observe the proper SSL certificate applied to the Rocket Chat app in the browser.
