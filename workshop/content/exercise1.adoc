@@ -35,22 +35,11 @@ controller that creates a PVC Snapshot.
 
 === Access the Bastion Host
 
-Using the bastion host credentials, `ssh` into the host:
+Using the bastion host credentials, `ssh` into the host on both terminals:
 
-[{format_cmd_exec}]
+[source,sh,role=execute]
 ----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname}
-----
-
-[source, subs="attributes"]
-----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname}
-----
-
-
-[{format_cmd_exec2}]
-----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+ssh %bastion_ssh_user_name%@%bastion_public_hostname%
 ----
 
 === Git repository
@@ -214,7 +203,7 @@ task is to modify the example rulebook to run the Ansible Job Template
 
 Follow these steps to modify the example rulebook:
 
-. Copy the example rulebook to a file named `exercise1-rulebook.yml` within the /home/lab-user/demos/eda_ocp/exercise_1
+. Copy the example rulebook to a file named `exercise1-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_1`
 +
 [NOTE]
 ====
@@ -239,6 +228,7 @@ configured rules.
 +
 . Modify the rule named `Perform Action` to `Create Snapshot`. Update the condition to create a snapshot when a Persistent Volume Claim is created via `event.type == "ADDED"`
 . Change the name of the run_job_template from `Example-Job-Template` to `EDA-OpenShift-Exercise1`
+. Save your changes within the `vi` editor by entering command mode by pressing the `Esc` key and typing `:wq` followed by the Enter key.
 
 WARNING: Ensure that your job template name matches `EDA-OpenShift-Exercise1`
 
@@ -265,9 +255,12 @@ WARNING: Ensure that your job template name matches `EDA-OpenShift-Exercise1`
 ----
 ====
 
+NOTE: Feel free to compare your solution with the provided solution found within
+the exercise.
+
 ==  Run the Ansible Rulebook
 
-In order to run the Ansible Rulebook we will take advantage of the existing
+In order to run the Ansible Rulebook you will take advantage of the existing
 quay.io Ansible Rulebook image that was pulled with in the prerequisites section
 and make some slight modifications within the container.
 
@@ -290,8 +283,14 @@ quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 +
 [{format_cmd_exec}]
 ----
-podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 <IMAGE_ID> /bin/bash
+podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 ddab79939a21 /bin/bash
 ----
++
+[NOTE]
+====
+Modify the Image ID ddab79939a21 if different than the Image ID provided within
+the podman images command.
+====
 +
 . Within the ansible-rulebook container, run the `setup.sh`
 +
@@ -315,6 +314,11 @@ OpenShift cluster.
 oc login --token={openshift_beaerer_token} --server={openshift_api_url}
 ----
 +
+[NOTE]
+====
+Accept the Use insecure connections check.
+====
++
 . Change to the `exercise_1` directory
 +
 [{format_cmd_exec}]
@@ -328,11 +332,6 @@ cd /mnt/exercise_1
 ansible-rulebook -i inventory --rulebook exercise1-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_token}
 ----
 +
-[{format_cmd_exec}]
-----
-(app-root) (app-root) oc project default
-----
-
 ----
 2023-04-25 16:13:19,351 - ansible_rulebook.engine - INFO - run_ruleset
 2023-04-25 16:13:19,352 - drools.ruleset - INFO - Using jar: /opt/app-root/lib/python3.9/site-packages/drools/jars/drools-ansible-rulebook-integration-runtime-1.0.0-SNAPSHOT.jar
@@ -346,19 +345,19 @@ ansible-rulebook -i inventory --rulebook exercise1-rulebook.yml --verbose --cont
 
 == Create the RocketChat App
 
-In this section, we'll deploy an app called Rocket.Chat, an open-source
+In this section, you'll deploy an app called Rocket.Chat, an open-source
 communication platform known for its flexibility and security. It's ideal for
 organizations that prioritize privacy, allowing real-time chats with your team,
 other businesses, or clients across various devices and integrated channels like
 social media and email.
 
-For this exercise, we won't focus on using Rocket.Chat itself, but rather on how
+For this exercise, we won't focus on using Rocket Chat itself, but rather on how
 its deployed components can trigger our Ansible Rulebook. By monitoring for a
-specific event, such as the creation of a Persistent Volume Claim, the
-Rocket.Chat deployment will initiate this event, causing our Ansible Rulebook to
-launch the Ansible Job Template 'EDA-OpenShift-Exercise1'.
+specific event, such as the creation of a Persistent Volume Claim, the Rocket
+Chat deployment will initiate this event, causing our Ansible Rulebook to launch
+the Ansible Job Template 'EDA-OpenShift-Exercise1'.
 
-Now, let's go through the steps to deploy the Rocket.Chat application.
+Now, let's go through the steps to deploy the Rocket Chat application.
 
 . Within the bottom terminal window, ssh into the bastion host if not already.
 +
@@ -374,7 +373,7 @@ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 oc login --token={openshift_bearer_token} --server={openshift_api_url}
 ----
 +
-. Within the Git repository, access the /home/lab-user/demos/eda_ocp/exercise_1 directory.
+. Within the Git repository, access the `/home/lab-user/demos/eda_ocp/exercise_1` directory.
 +
 [{format_cmd_exec}]
 ----
@@ -428,17 +427,42 @@ One idea could be to add a scheduler to the PVC creation process where the
 Ansible Job runs daily, weekly, monthly based on your compliance
 requirements for your snapshots.
 
-//TODO
-== Accessing the  Rocket.Chat Application
+== Accessing the Rocket Chat Application
 
 Prior to moving to the following exercise, I wanted to point out that when you
-go to the Rocket.Chat URL within your web browser, notice how a self-signed
+go to the Rocket Chat URL within your web browser, notice how a self-signed
 certificate is used. 
 
-In Exercise 2, you will learn how to use Ansible Rulebooks to automate the
-process of providing a valid Lets Encrypt certificate. 
+To get the Rocket Chat URL, within the bottom terminal:
 
-== Cleanup RocketChat App
+----
+oc get routes
+----
+
+----
+NAME          HOST/PORT                                                                PATH   SERVICES      PORT
+ TERMINATION   WILDCARD
+rocket-chat   rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com          rocket-chat   3000
+               None
+----
+
+Via your browser access the Rocket Chat URL, e.g.
+`rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com`, and
+notice how the Rocket Chat App uses a self-signed certificate.
+
+//TODO add image
+
+[NOTE]
+====
+If the Rocket Chat application doesn't immediately load, it may still completing
+the installation process.
+====
+
+In Exercise 2, you will learn how to use Ansible Rulebooks to automate the
+process of providing a valid Lets Encrypt certificate to enhance the security of
+the Rocket Chat application via the use of proper SSL certificates.
+
+== Cleanup Rocket Chat App
 
 As we will be using the RocketChat App for the next exercise, lets remove it as
 we will be using it to trigger our next event relating SSL management.
@@ -447,7 +471,7 @@ To remove:
  
 [{format_cmd_exec}]
 ----
-cd /path/to/eda_ocp/exercise_1
+cd /home/lab-user/demos/eda_ocp/exercise_1/
 ----
 
 
