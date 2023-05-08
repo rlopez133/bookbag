@@ -18,8 +18,7 @@ You will work with an Ansible playbook that performs the following tasks:
 
 * Creates an Issuer 
 * Generates a Certificate 
-* Patches your application's OpenShift
-Route with a properly signed SSL certificate 
+* Patches Rocket Chat's OpenShift Route with a properly signed SSL certificate 
 
 Your objective is to develop an Ansible Rulebook that activates this Ansible
 playbook through an Ansible Job within the automation controller.
@@ -32,11 +31,11 @@ playbook through an Ansible Job within the automation controller.
 * Access to the automation controller dashboard
 * SSH capabilities to the Bastion Host via terminal
 
-NOTE: The prerequisites details can all be found within the Overview section.
+NOTE: The Prerequisites details can all be found within the Overview section.
 
 == Understanding the Provided Ansible Playbook
 
-This Ansible playbook is specifically designed to configure a Lets Encrypt
+This Ansible playbook is specifically designed to configure a Let's Encrypt
 certificate and apply it to an application in OpenShift leveraging the
 capabilities of both the Cert-Manager Operator and the Cert-Utils Operator. It
 employs Let's Encrypt, a well-respected Certificate Authority, to acquire a
@@ -54,7 +53,7 @@ Rulebook.
 The following is a breakdown of the tasks being performed by the Ansible playbook:
 
 . *Define variables:* The playbook starts by defining various variables required for the configuration process. These include the issuer's name (Let's Encrypt), namespace, email, certificate name, namespace, DNS names, secret name, route name, and route namespace.
-. *Create Issuer:* The first task in the playbook is to create an Issuer using the `kubernetes.core.k8s` module. An Issuer is a cert-manager resource responsible for issuing certificates. In this case, the Issuer is configured to use the Let's Encrypt ACME server to obtain SSL certificates.
+. *Create Issuer:* The first task in the playbook is to create an Issuer using the `kubernetes.core.k8s` module. An Issuer is a cert-manager resource responsible for issuing certificates. In this case, the Issuer is configured to use the Let's Encrypt Automated Certificate Management Environment (ACME) server to obtain SSL certificates.
 . *Create Certificate:* The second task creates a Certificate resource, which requests an SSL certificate from the previously created Issuer (Let's Encrypt). It specifies the required DNS names, issuer reference, and private key settings.
 . *Patch Route with Cert Manager Annotations:* The final task patches the OpenShift Route with Cert Manager annotations using the `kubernetes.core.k8s` module. This step ensures that the Route is updated with the newly created SSL certificate and its associated metadata. The `cert-utils-operator.redhat-cop.io/certs-from-secret` annotation is particularly important, as it tells the Cert-Utils Operator to watch the specified secret and automatically patch the TLS certificate and key to the Route when it's updated.
 
@@ -199,6 +198,7 @@ configured rules.
 +
 . Modify the rule named `Perform Action` to `Patch a Route`. Update the condition to patch a route when a Route is created via `event.type == "ADDED"`
 . Change the name of the run_job_template from `Example-Job-Template` to `EDA-OpenShift-Exercise2`
+. Save your changes within the `vi` editor by entering command mode by pressing the `Esc` key and typing `:wq` followed by the Enter key.
 
 WARNING: Ensure that your job template name matches `EDA-OpenShift-Exercise2`
 
@@ -225,6 +225,9 @@ WARNING: Ensure that your job template name matches `EDA-OpenShift-Exercise2`
 ----
 ====
 
+NOTE: Feel free to compare your solution with the provided solution found within
+the exercise.
+
 ==  Run the Ansible Rulebook
 
 In order to run the Ansible Rulebook we will take advantage of the existing
@@ -248,7 +251,7 @@ $ cd /home/lab-user/demos/eda_ocp/
 . Capture the image ID of the Ansible Rulebook image
 +
 ----
-$ podman images
+podman images
 REPOSITORY                        TAG         IMAGE ID      CREATED      SIZE
 quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 ----
@@ -256,7 +259,7 @@ quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 . Start the ansible-rulebook container and access it.
 +
 ----
-$ podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 <IMAGE_ID> /bin/bash
+podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 <IMAGE_ID> /bin/bash
 ----
 +
 . Within the ansible-rulebook container, run the `setup.sh`
@@ -277,37 +280,47 @@ OpenShift cluster.
 +
 [{format_cmd_exec}]
 ----
-$ oc login --token={openshift_token} --server={openshift_api_url}
+oc login --token={openshift_token} --server={openshift_api_url}
 ----
++
+[NOTE]
+====
+Accept the Use insecure connections check.
+====
 +
 . Change to the `exercise_2` directory
 +
 [{format_cmd_exec}]
 ----
-$ cd /mnt/exercise_2
+cd /mnt/exercise_2
 ----
 . Run your Ansible Rulebook (`exercise2-rulebook.yml`) with your Ansible automation controller credentials
 +
 [{format_cmd_exec}]
 ----
-$ ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_admin_token}
+ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_admin_token}
 ----
 +
 ----
-(app-root) (app-root) oc project default
-2023-04-25 16:13:19,351 - ansible_rulebook.app - INFO - Starting sources
-2023-04-25 16:13:19,351 - ansible_rulebook.app - INFO - Starting rules
-2023-04-25 16:13:19,351 - ansible_rulebook.engine - INFO - run_ruleset
-2023-04-25 16:13:19,352 - drools.ruleset - INFO - Using jar: /opt/app-root/lib/python3.9/site-packages/drools/jars/drools-ansible-rulebook-integration-runtime-1.0.0-SNAPSHOT.jar
-2023-04-25 16:13:20,269 - ansible_rulebook.engine - INFO - ruleset define: {"name": "Listen for newly added PVC resources and create a snapshot", "hosts": ["all"], "sources": [{"EventSource": {"name": "sabre1041.eda.k8s", "source_name": "sabre1041.eda.k8s", "source_args": {"api_version": "v1", "kind": "PersistentVolumeClaim"}, "source_filters": []}}], "rules": [{"Rule": {"name": "Create Snapshot", "condition": {"AllCondition": [{"EqualsExpression": {"lhs": {"Event": "type"}, "rhs": {"String": "ADDED"}}}]}, "actions": [{"Action": {"action": "run_playbook", "action_args": {"name": "pvc_snapshot_playbook.yml", "extra_vars": {"event": "{{ event }}"}}}}], "enabled": true}}]}
-2023-04-25 16:13:20,291 - ansible_rulebook.engine - INFO - load source
-2023-04-25 16:13:21,295 - ansible_rulebook.engine - INFO - load source filters
-2023-04-25 16:13:21,295 - ansible_rulebook.engine - INFO - loading eda.builtin.insert_meta_info
-2023-04-25 16:13:21,996 - ansible_rulebook.engine - INFO - Calling main in sabre1041.eda.k8s
-2023-04-25 16:13:21,996 - root - INFO - Running k8s eda source
+2023-05-05 19:40:00,292 - ansible_rulebook.app - INFO - Starting sources
+2023-05-05 19:40:00,293 - ansible_rulebook.app - INFO - Starting rules
+2023-05-05 19:40:00,293 - ansible_rulebook.engine - INFO - run_ruleset
+2023-05-05 19:40:00,293 - drools.ruleset - INFO - Using jar: /opt/app-root/lib/python3.9/site-packages/drools/jars
+/drools-ansible-rulebook-integration-runtime-1.0.0-SNAPSHOT.jar
+2023-05-05 19:40:01,211 - ansible_rulebook.engine - INFO - ruleset define: {"name": "Listen for newly created Rout
+e", "hosts": ["all"], "sources": [{"EventSource": {"name": "sabre1041.eda.k8s", "source_name": "sabre1041.eda.k8s"
+, "source_args": {"api_version": "v1", "kind": "Route"}, "source_filters": []}}], "rules": [{"Rule": {"name": "Pat
+ch a Route", "condition": {"AllCondition": [{"EqualsExpression": {"lhs": {"Event": "type"}, "rhs": {"String": "ADD
+ED"}}}]}, "actions": [{"Action": {"action": "run_job_template", "action_args": {"name": "EDA-OpenShift-Exercise2",
+ "organization": "Default"}}}], "enabled": true}}]}
+2023-05-05 19:40:01,230 - ansible_rulebook.engine - INFO - load source
+2023-05-05 19:40:02,278 - ansible_rulebook.engine - INFO - load source filters
+2023-05-05 19:40:02,278 - ansible_rulebook.engine - INFO - loading eda.builtin.insert_meta_info
+2023-05-05 19:40:02,952 - ansible_rulebook.engine - INFO - Calling main in sabre1041.eda.k8s
+2023-05-05 19:40:02,952 - root - INFO - Running k8s eda source
 ----
 
-== Create the RocketChat App
+== Create the Rocket Chat App
 
 With our Ansible Rulebook watching for an event, we will now create the Rocket
 Chat application that will trigger the Ansible Rulebook once a Route is created.
@@ -359,8 +372,14 @@ oc create -f app.yml
 +
 ----
 ...
-2023-04-26 19:05:21,598 - ansible_rulebook.builtin - INFO - running job template: EDA-OpenShift-Exercise1, organization: Default
-2023-04-26 19:05:21,598 - ansible_rulebook.builtin - INFO - ruleset: Listen for newly added PVC resources and create a snapshot, rule Create Snapshot
+2023-05-05 19:42:46,764 - ansible_rulebook.rule_set_runner - INFO - action args: {'name': 'EDA-OpenShift-Exercise2
+', 'organization': 'Default'}
+2023-05-05 19:42:46,764 - ansible_rulebook.builtin - INFO - running job template: EDA-OpenShift-Exercise2, organiz
+ation: Default
+2023-05-05 19:42:46,764 - ansible_rulebook.builtin - INFO - ruleset: Listen for newly created Route, rule Patch a
+Route
+2023-05-05 19:46:35,367 - ansible_rulebook.rule_set_runner - INFO - Task action::run_job_template::Listen for newl
+y created Route::Patch a Route finished, active actions 0
 ----
 +
 . Head toward your browser with the Ansible Automation Platform dashboard and login (if not already). Within the dashboard, select `Views->Jobs` and you will see the `EDA-OpenShift-Exercise2` job is launched and running.
@@ -374,6 +393,8 @@ $ oc get routes
 ----
 +
 . Using the Route URL, head to your browser and copy paste the link provided. You should now notice the Rocket Chat application has a proper SSL certificate which can be identified with the lock icon.
++
+image::images/rocketchat_secure.png[]
 +
 . Congratulations! You now have completed Exercise 2 of applying properly signed certificates to applications created within OpenShift.
 

@@ -8,22 +8,6 @@
 
 == Ansible Automation Platfrom 2 EDA on OpenShift
 
-Welcome to the Ansible Automation Platform 2 EDA on OpenShift Lab. In this lab,
-you will learn how to create and use Ansible Rulebooks that can trigger events
-within an OpenShift environment. 
-
-Exercise 1 will focus on how to create Volume Snapshots when a Persistent Volume
-Claim is created by an application.
-
-Exercise 2 will focus on SSL Management and how to use Let's Encrypt
-Certificates to an OpenShift application when it is created.
-
-Exercise 3 will focus on setting resource quotas when a new namespace is
-created. This is important in scenarios where an OpenShift cluster is shared
-across an organization and you want to ensure not one specific team over
-consumes resources. 
-
-
 Welcome to the Ansible Automation Platform 2 Event Driven Ansible (EDA) on
 OpenShift Lab. This comprehensive lab experience is designed to provide you with
 an understanding of the capabilities of Ansible Rulebooks in the context of an
@@ -32,22 +16,22 @@ OpenShift environment.
 The lab is divided into three key exercises, each focusing on a specific aspect
 of EDA within an OpenShift environment.
 
-Exercise 1: Persistent Volume Snapshots Management - In this exercise,
-participants will learn the process of automatically creating Volume Snapshots
+*Exercise 1: Persistent Volume Snapshots Management* - In this exercise,
+you will learn the process of automatically creating Volume Snapshots
 when a Persistent Volume Claim is created by an application. This section
 provides a detailed overview of the interaction between Ansible Rulebooks and
 how watching for specific events can trigger an Automation Job to create the
 generation of Volume Snapshots.
 
-Exercise 2: SSL Management and Let's Encrypt Certificates Integration - This
+*Exercise 2: SSL Management and Let's Encrypt Certificates Integration* - This
 exercise delves into SSL Management and demonstrates the practical application
 of integrating Let's Encrypt Certificates with OpenShift applications upon their
 creation. Participants will gain insights into enhancing the security of their
 applications through the effective use of SSL certificates.
 
-Exercise 3: Resource Quota Allocation in a Shared OpenShift Environment - The
+*Exercise 3: Resource Quota Allocation in a Shared OpenShift Environment* - The
 final exercise emphasizes the importance of resource management in scenarios
-where an OpenShift cluster is shared across an organization. Participants will
+where an OpenShift cluster is shared across an organization. You will
 learn how to set resource quotas when creating a new namespace, ensuring that
 resources are fairly distributed and not over-consumed by any specific team.
 
@@ -58,10 +42,10 @@ You can access the Automation Controller web console at:
 
 [%autowidth.stretch,width=70%,cols="^.^a,^.^a",options="header"]
 |===
-| *Controller Console URL:* | {aap_controller_web_url}
-| *Admin Username:* | {aap_controller_admin_user}
-| *Admin Password:* | {aap_controller_admin_password}
-| *Controller Token:* | {aap_controller_token}
+| *Controller Console URL:* | %aap_controller_web_url%
+| *Admin Username:* | %aap_controller_admin_user%
+| *Admin Password:* | %aap_controller_admin_password%
+| *Controller Token:* | %aap_controller_token%
 |===
 
 ===  Bastion Host Credentials
@@ -71,8 +55,8 @@ OpenShift command line access pre-configured.
 
 [%autowidth.stretch,width=70%,cols="^.^a,^.^a",options="header"]
 |===
-| *SSH Command:*  | ssh {bastion_ssh_user_name}@{bastion_public_hostname}
-| *SSH Password:* | {bastion_ssh_password}
+| *SSH Command:*  | ssh %bastion_ssh_user_name%@%bastion_public_hostname%
+| *SSH Password:* | %bastion_ssh_password%
 |===
 
 === OpenShift Access
@@ -80,9 +64,9 @@ OpenShift command line access pre-configured.
 
 [%autowidth.stretch,width=70%,cols="^.^a,^.^a",options="header"]
 |===
-| *OpenShift Console URL:* | {openshift_console_url}
+| *OpenShift Console URL:* | %openshift_console_url%
 | *Admin Username:* | kubeadmin
-| *Admin Password:* | {openshift_kubeadmin_password}
-| *OpenShift Token:* | {openshift_bearer_token}
+| *Admin Password:* | %openshift_kubeadmin_password%
+| *OpenShift Token:* | %openshift_bearer_token%
 |===
 

@@ -450,7 +450,7 @@ Via your browser access the Rocket Chat URL, e.g.
 `rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com`, and
 notice how the Rocket Chat App uses a self-signed certificate.
 
-//TODO add image
+image::images/rocketchat_not_secure.png[]
 
 [NOTE]
 ====
