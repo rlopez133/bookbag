@@ -45,16 +45,16 @@ across namespaces in a OpenShift cluster. Resource quotas play a vital role in
 preventing a single namespace from monopolizing resources and causing
 performance issues.
 
-The Kubernetes.core.k8s module is used to set the resource quotas, enabling
+The `kubernetes.core.k8s` module is used to set the resource quotas, enabling
 efficient management of resources allocated to different projects, teams, or
 applications within the OpenShift cluster.
 
 The following is a breakdown of the tasks being performed by the Ansible
 playbook:
 
-* Define variables: The playbook starts by defining various variables required for the configuration process. These include the namespace (`ns`), CPU and memory requests (`requests_cpu` and `requests_memory`), and CPU and memory limits (`limits_cpu` and `limits_memory`). These variables make it easy to adjust resource quotas for different quota requirements.
+* *Define variables:* The playbook starts by defining various variables required for the configuration process. These include the namespace (`ns`), CPU and memory requests (`requests_cpu` and `requests_memory`), and CPU and memory limits (`limits_cpu` and `limits_memory`). These variables make it easy to adjust resource quotas for different quota requirements.
 
-* Set resource quotas: The single task in the playbook sets the resource quotas using the `kubernetes.core.k8s` module. This module creates or updates a ResourceQuota object in the specified namespace, with the resource limits and requests defined by the variables. By using this module, the playbook can efficiently set resource quotas for a Openshift namespace, ensuring fair allocation of resources in the cluster.
+* *Set resource quotas:* The single task in the playbook sets the resource quotas using the `kubernetes.core.k8s` module. This module creates or updates a ResourceQuota object in the specified namespace, with the resource limits and requests defined by the variables. By using this module, the playbook can efficiently set resource quotas for a Openshift namespace, ensuring fair allocation of resources in the cluster.
 
 .Ansible Resource Management Playbook
 ----
@@ -157,7 +157,7 @@ WARNING: Ensure that your job template name matches `EDA-OpenShift-Exercise3`
         api_version: v1
         kind: Namespace
   rules:
-    - name: Set Resource Quotas to  a Namespace
+    - name: Set Resource Quotas to a Namespace
       condition: event.type == "ADDED"
       action:
         run_job_template:
@@ -243,22 +243,22 @@ ansible-rulebook -i inventory --rulebook exercise3-rulebook.yml --verbose --cont
 ----
 +
 ----
-2023-05-05 19:40:00,292 - ansible_rulebook.app - INFO - Starting sources
-2023-05-05 19:40:00,293 - ansible_rulebook.app - INFO - Starting rules
-2023-05-05 19:40:00,293 - ansible_rulebook.engine - INFO - run_ruleset
-2023-05-05 19:40:00,293 - drools.ruleset - INFO - Using jar: /opt/app-root/lib/python3.9/site-packages/drools/jars
+2023-05-09 16:31:37,295 - ansible_rulebook.app - INFO - Starting sources
+2023-05-09 16:31:37,295 - ansible_rulebook.app - INFO - Starting rules
+2023-05-09 16:31:37,295 - ansible_rulebook.engine - INFO - run_ruleset
+2023-05-09 16:31:37,296 - drools.ruleset - INFO - Using jar: /opt/app-root/lib/python3.9/site-packages/drools/jars
 /drools-ansible-rulebook-integration-runtime-1.0.0-SNAPSHOT.jar
-2023-05-05 19:40:01,211 - ansible_rulebook.engine - INFO - ruleset define: {"name": "Listen for newly created Rout
-e", "hosts": ["all"], "sources": [{"EventSource": {"name": "sabre1041.eda.k8s", "source_name": "sabre1041.eda.k8s"
-, "source_args": {"api_version": "v1", "kind": "Route"}, "source_filters": []}}], "rules": [{"Rule": {"name": "Pat
-ch a Route", "condition": {"AllCondition": [{"EqualsExpression": {"lhs": {"Event": "type"}, "rhs": {"String": "ADD
-ED"}}}]}, "actions": [{"Action": {"action": "run_job_template", "action_args": {"name": "EDA-OpenShift-Exercise2",
- "organization": "Default"}}}], "enabled": true}}]}
-2023-05-05 19:40:01,230 - ansible_rulebook.engine - INFO - load source
-2023-05-05 19:40:02,278 - ansible_rulebook.engine - INFO - load source filters
-2023-05-05 19:40:02,278 - ansible_rulebook.engine - INFO - loading eda.builtin.insert_meta_info
-2023-05-05 19:40:02,952 - ansible_rulebook.engine - INFO - Calling main in sabre1041.eda.k8s
-2023-05-05 19:40:02,952 - root - INFO - Running k8s eda source
+2023-05-09 16:31:38,262 - ansible_rulebook.engine - INFO - ruleset define: {"name": "Listen for newly created Name
+space", "hosts": ["all"], "sources": [{"EventSource": {"name": "sabre1041.eda.k8s", "source_name": "sabre1041.eda.
+k8s", "source_args": {"api_version": "v1", "kind": "Namespace"}, "source_filters": []}}], "rules": [{"Rule": {"nam
+e": "Set Resource Quotas to  a Namespace", "condition": {"AllCondition": [{"EqualsExpression": {"lhs": {"Event": "
+type"}, "rhs": {"String": "ADDED"}}}]}, "actions": [{"Action": {"action": "run_job_template", "action_args": {"nam
+e": "EDA-OpenShift-Exercise3", "organization": "Default"}}}], "enabled": true}}]}
+2023-05-09 16:31:38,282 - ansible_rulebook.engine - INFO - load source
+2023-05-09 16:31:39,310 - ansible_rulebook.engine - INFO - load source filters
+2023-05-09 16:31:39,310 - ansible_rulebook.engine - INFO - loading eda.builtin.insert_meta_info
+2023-05-09 16:31:40,010 - ansible_rulebook.engine - INFO - Calling main in sabre1041.eda.k8s
+2023-05-09 16:31:40,011 - root - INFO - Running k8s eda source
 ----
 
 //TODO create setps to trigger Rulebook and fix output
@@ -269,14 +269,12 @@ ED"}}}]}, "actions": [{"Action": {"action": "run_job_template", "action_args": {
 +
 ----
 ...
-2023-05-05 19:42:46,764 - ansible_rulebook.rule_set_runner - INFO - action args: {'name': 'EDA-OpenShift-Exercise2
+2023-05-09 16:33:05,144 - ansible_rulebook.rule_set_runner - INFO - action args: {'name': 'EDA-OpenShift-Exercise3
 ', 'organization': 'Default'}
-2023-05-05 19:42:46,764 - ansible_rulebook.builtin - INFO - running job template: EDA-OpenShift-Exercise2, organiz
+2023-05-09 16:33:05,144 - ansible_rulebook.builtin - INFO - running job template: EDA-OpenShift-Exercise3, organiz
 ation: Default
-2023-05-05 19:42:46,764 - ansible_rulebook.builtin - INFO - ruleset: Listen for newly created Route, rule Patch a
-Route
-2023-05-05 19:46:35,367 - ansible_rulebook.rule_set_runner - INFO - Task action::run_job_template::Listen for newl
-y created Route::Patch a Route finished, active actions 0
+2023-05-09 16:33:05,144 - ansible_rulebook.builtin - INFO - ruleset: Listen for newly created Namespace, rule Set
+Resource Quotas to  a Namespace
 ----
 +
 . Head toward your browser with the Ansible Automation Platform dashboard and login (if not already). Within the dashboard, select `Views->Jobs` and you will see the `EDA-OpenShift-Exercise3` job is launched and running.
@@ -286,8 +284,8 @@ y created Route::Patch a Route finished, active actions 0
 [{format_cmd_exec}]
 ----
 $ oc get resourcequota-n <namespace>
-NAME            AGE   REQUEST                                 LIMIT
-resource-quota  20s   requests.cpu=1,requests.memory=1Gi      limits.cpu=2,limits.memory=2Gi
+NAME             AGE   REQUEST                                     LIMIT
+resource-quota   60s   requests.cpu: 0/1, requests.memory: 0/1Gi   limits.cpu: 0/2, limits.memory: 0/2Gi
 ----
 +
 . Congratulations! You now have completed Exercise 3 of applying resource quotas to newly created namespaces within an OpenShift cluster.
