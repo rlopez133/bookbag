@@ -1,3 +1,5 @@
+:bastion_ssh_user_name: %bastion_ssh_user_name%
+:bastion_public_hostname: %bastion_public_hostname%
 :aap_controller_web_url: %aap_controller_web_url%
 :aap_controller_admin_user: %aap_controller_admin_user%
 :aap_controller_admin_password: %aap_controller_admin_password%
@@ -32,9 +34,9 @@ controller using specific event variables.
 
 Using the bastion host credentials, `ssh` into the host:
 
-[{format_cmd_exec}]
+[source,options="nowrap",role="execute",subs="verbatim,attributes,quotes"]
 ----
-$ ssh %bastion_ssh_user_name%@%bastion_public_hostname%
+$ ssh lab-user@{bastion_public_hostname}
 ----
 
 === Git repository
