@@ -6,7 +6,11 @@
 :aap_controller_admin_token: %aap_controller_admin_token%
 :openshift_api_url: %openshift_api_url%
 :openshift_token: %openshift_token%
-:format_cmd_exec: source,options="nowrap",,role="copy",subs="{markup-in-source}"
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+:format_cmd_output: bash,options="nowrap",subs="{markup-in-source}"
+:format_cmd_exec: source,options="nowrap",role="execute",subs="{markup-in-source}"
+:format_cmd_exec2: source,options="nowrap",role="execute-2",subs="{markup-in-source}"
 
 == Introduction to Ansible Rulebooks
 
