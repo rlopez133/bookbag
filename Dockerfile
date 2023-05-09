@@ -7,7 +7,8 @@ COPY . /tmp/src
 RUN rm -rf /tmp/src/.git* && \
     chown -R 1001 /tmp/src && \
     chgrp -R 0 /tmp/src && \
-    chmod -R g+w /tmp/src
+    chmod -R g+w /tmp/src && \
+    echo "ServerAliveInterval 60" >> /etc/ssh/ssh_config 
 
 USER 1001
 
