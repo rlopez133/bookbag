@@ -314,7 +314,7 @@ OpenShift cluster.
 +
 [{format_cmd_exec}]
 ----
-oc login --token={openshift_beaerer_token} --server={openshift_api_url}
+oc login --token={openshift_bearer_token} --server={openshift_api_url}
 ----
 +
 [NOTE]
