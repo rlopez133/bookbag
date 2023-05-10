@@ -297,7 +297,7 @@ Resource Quotas to  a Namespace
 +
 [{format_cmd_exec}]
 ----
-$ oc get resourcequota-n <namespace>
+$ oc get resourcequota -n eda
 ----
 
 ----
