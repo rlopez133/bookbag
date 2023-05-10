@@ -208,7 +208,7 @@ Follow these steps to modify the example rulebook:
 
 . Copy the example rulebook to a file named `exercise1-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_1`
 +
-image::images/vi-edit.gif[link="images/vi-edit.gif"]
+image::images/vi-edit.gif[link="images/vi-edit.gif".window="_blank"]
 +
 [NOTE]
 ====
@@ -460,7 +460,7 @@ Via your browser access the Rocket Chat URL, e.g.
 `rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com`, and
 notice how the Rocket Chat App uses a self-signed certificate.
 
-image::images/rocketchat_not_secure.png[link="images/rocketchat_not_secure.png"]
+image::images/rocketchat_not_secure.png[link="images/rocketchat_not_secure.png",window="_blank"]
 
 [NOTE]
 ====
