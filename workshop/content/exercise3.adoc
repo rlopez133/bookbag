@@ -115,6 +115,8 @@ Follow these steps to modify the example rulebook:
 
 . Copy the example rulebook to a file named `exercise3-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_3` directory.
 +
+image::images/vi-edit.gif[link="images/vi-edit.gif"]
++
 [NOTE]
 ====
 Using the `vi` editor, to ensure that the formating of the pasted content is
@@ -185,26 +187,33 @@ Otherwise continue with the steps as provided to create a new container.
 
 . As the `lab-user` within your bastion host, change directory to the Git repository demos folder
 +
+[{format_cmd_exec}]
 ----
-$ cd /home/lab-user/demos/eda_ocp/
+cd /home/lab-user/demos/eda_ocp/
 ----
 +
 . Capture the image ID of the Ansible Rulebook image
 +
+[{format_cmd_exec}]
 ----
 podman images
+----
+
+----
 REPOSITORY                        TAG         IMAGE ID      CREATED      SIZE
 quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 ----
 +
 . Start the ansible-rulebook container and access it.
 +
+[{format_cmd_exec}]
 ----
 podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 <IMAGE_ID> /bin/bash
 ----
 +
 . Within the ansible-rulebook container, run the `setup.sh`
 +
+[{format_cmd_exec}]
 ----
 (app-root) (app-root) ./setup.sh
 ----
@@ -265,6 +274,11 @@ e": "EDA-OpenShift-Exercise3", "organization": "Default"}}}], "enabled": true}}]
 
 . Create a namespace
 +
+[{format_cmd_exec}]
+----
+oc new-project eda
+----
++
 . Looking at the top terminal window with the Ansible Rulebook container running you will see output similar to:
 +
 ----
@@ -284,14 +298,14 @@ Resource Quotas to  a Namespace
 [{format_cmd_exec}]
 ----
 $ oc get resourcequota-n <namespace>
+----
+
+----
 NAME             AGE   REQUEST                                     LIMIT
 resource-quota   60s   requests.cpu: 0/1, requests.memory: 0/1Gi   limits.cpu: 0/2, limits.memory: 0/2Gi
 ----
-+
-. Congratulations! You now have completed Exercise 3 of applying resource quotas to newly created namespaces within an OpenShift cluster.
 
 == Verify the resource quota
-
 
 To test the resource quotas using the `oc` command-line tool, you can create a
 simple pod that requests and consumes more resources than allowed by the
@@ -334,6 +348,7 @@ resource quotas defined in the previous example (1 CPU and 1Gi for requests, and
 
 Attempt to create the pod via:
 
+[{format_cmd_exec}]
 ----
 oc create -f test-pod.yml -n <namespace>
 ----
@@ -352,6 +367,7 @@ should reside in proper creation of the test pod. For example, setting the
 request values to 1 cpu, 1Gi of memory, while setting the limits to 2 cpu and
 2Gi of memory will result in a successful creation of the pod.
 
+[{format_cmd_exec}]
 ----
 oc create -f test-pod.yml -n <namespace>
 ----
@@ -359,8 +375,6 @@ oc create -f test-pod.yml -n <namespace>
 ----
 pod/test-pod created
 ----
-
-
 
 == Summary
 

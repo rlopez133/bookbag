@@ -6,8 +6,8 @@
 :aap_controller_admin_token: %aap_controller_admin_token%
 :openshift_api_url: %openshift_api_url%
 :openshift_token: %openshift_token%
-:format_cmd_exec: source,options="nowrap",role="execute",subs="verbatim,attributes,quotes"
-:format_cmd_exec2: source,options="nowrap",role="execute-2",subs="verbatim,attributes,quotes"
+:format_cmd_exec: source,options="nowrap",role="copy",subs="verbatim,attributes,quotes"
+:format_cmd_exec2: source,options="nowrap",role="copy",subs="verbatim,attributes,quotes"
 :format_cmd_output: bash,options="nowrap",subs="verbatim,attributes,quotes"
 
 == Introduction to Ansible Rulebooks
@@ -33,16 +33,16 @@ controller that creates a PVC Snapshot.
 
 Using the bastion host credentials, `ssh` into the host on both terminals:
 
-[source,options="nowrap",role="execute",subs="verbatim,attributes,quotes"]
-----
-%ssh_command%
-----
-
-Test
-
 [{format_cmd_exec}]
 ----
 %ssh_command%
+----
+
+The password to accesss the bastion host:
+
+[{format_cmd_exec}]
+----
+%ssh_password%
 ----
 
 === Git repository
@@ -278,8 +278,12 @@ cd /home/lab-user/demos/eda_ocp/
 +
 . Capture the image ID of the Ansible Rulebook image
 +
+[{format_cmd_exec}]
 ----
 podman images
+----
+
+----
 REPOSITORY                        TAG         IMAGE ID      CREATED      SIZE
 quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 ----
@@ -456,7 +460,7 @@ Via your browser access the Rocket Chat URL, e.g.
 `rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com`, and
 notice how the Rocket Chat App uses a self-signed certificate.
 
-image::images/rocketchat_not_secure.png[]
+image::images/rocketchat_not_secure.png[link="images/rocketchat_not_secure.png"]
 
 [NOTE]
 ====

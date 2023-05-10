@@ -175,6 +175,8 @@ Follow these steps to modify the example rulebook:
 
 . Copy the example rulebook to a file named `exercise2-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_2` directory.
 +
+image::images/vi-edit.gif[link="images/vi-edit.gif"]
++
 [NOTE]
 ====
 Using the `vi` editor, to ensure that the formating of the pasted content is
@@ -244,26 +246,33 @@ Otherwise continue with the steps as provided to create a new container.
 
 . As the `lab-user` within your bastion host, change directory to the Git repository demos folder
 +
+[{format_cmd_exec}]
 ----
-$ cd /home/lab-user/demos/eda_ocp/
+cd /home/lab-user/demos/eda_ocp/
 ----
 +
 . Capture the image ID of the Ansible Rulebook image
 +
+[{format_cmd_exec}]
 ----
 podman images
+----
+
+----
 REPOSITORY                        TAG         IMAGE ID      CREATED      SIZE
 quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 ----
 +
 . Start the ansible-rulebook container and access it.
 +
+[{format_cmd_exec}]
 ----
-podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 <IMAGE_ID> /bin/bash
+podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 ddab79939a21 /bin/bash
 ----
 +
 . Within the ansible-rulebook container, run the `setup.sh`
 +
+[{format_cmd_exec}]
 ----
 (app-root) (app-root) ./setup.sh
 ----
@@ -394,7 +403,7 @@ $ oc get routes
 +
 . Using the Route URL, head to your browser and copy paste the link provided. You should now notice the Rocket Chat application has a proper SSL certificate which can be identified with the lock icon.
 +
-image::images/rocketchat_secure.png[]
+image::images/rocketchat_secure.png[link="images/rocketchat_secure.png"]
 +
 . Congratulations! You now have completed Exercise 2 of applying properly signed certificates to applications created within OpenShift.
 
