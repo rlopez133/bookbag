@@ -1,5 +1,5 @@
-:bastion_ssh_user_name: %bastion_ssh_user_name%
-:bastion_public_hostname: %bastion_public_hostname%
+:ssh_command: "ssh lab-user@{bastion_public_hostname}"
+:ssh_password: {bastion_ssh_password}
 :aap_controller_web_url: %aap_controller_web_url%
 :aap_controller_admin_user: %aap_controller_admin_user%
 :aap_controller_admin_password: %aap_controller_admin_password%
@@ -36,7 +36,7 @@ Using the bastion host credentials, `ssh` into the host:
 
 [source,options="nowrap",role="execute",subs="verbatim,attributes,quotes"]
 ----
-$ ssh lab-user@{bastion_public_hostname}
+$ %ssh_command%
 ----
 
 === Git repository
