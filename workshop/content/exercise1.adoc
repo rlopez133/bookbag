@@ -1,18 +1,14 @@
-:bastion_ssh_user_name: %bastion_ssh_user_name%
-:bastion_public_hostname: %bastion_public_hostname%
+:ssh_command: "ssh lab-user@{bastion_public_hostname}"
+:ssh_password: {bastion_ssh_password}
 :aap_controller_web_url: %aap_controller_web_url%
 :aap_controller_admin_user: %aap_controller_admin_user%
 :aap_controller_admin_password: %aap_controller_admin_password%
 :aap_controller_admin_token: %aap_controller_admin_token%
 :openshift_api_url: %openshift_api_url%
 :openshift_token: %openshift_token%
-:markup-in-source: verbatim,attributes,quotes
-:format_cmd_exec: source,options="nowrap",,role="copy",subs="{markup-in-source}"
-:format_cmd_output: bash,options="nowrap",subs="{markup-in-source}"
-ifeval::["%cloud_provider%" == "ec2"]
-:format_cmd_exec: source,options="nowrap",role="execute",subs="{markup-in-source}"
-:format_cmd_exec2: source,options="nowrap",role="execute-2",subs="{markup-in-source}"
-endif::[]
+:format_cmd_exec: source,options="nowrap",role="execute",subs="verbatim,attributes,quotes"
+:format_cmd_exec2: source,options="nowrap",role="execute-2",subs="verbatim,attributes,quotes"
+:format_cmd_output: bash,options="nowrap",subs="verbatim,attributes,quotes"
 
 == Introduction to Ansible Rulebooks
 
@@ -37,9 +33,16 @@ controller that creates a PVC Snapshot.
 
 Using the bastion host credentials, `ssh` into the host on both terminals:
 
-[source,sh,role=execute]
+[source,options="nowrap",role="execute",subs="verbatim,attributes,quotes"]
 ----
-ssh %bastion_ssh_user_name%@%bastion_public_hostname%
+%ssh_command%
+----
+
+Test
+
+[{format_cmd_exec}]
+----
+%ssh_command%
 ----
 
 === Git repository
@@ -361,35 +364,35 @@ Now, let's go through the steps to deploy the Rocket Chat application.
 
 . Within the bottom terminal window, ssh into the bastion host if not already.
 +
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 +
 . Login using your token within this new terminal window.
 +
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 oc login --token={openshift_bearer_token} --server={openshift_api_url}
 ----
 +
 . Within the Git repository, access the `/home/lab-user/demos/eda_ocp/exercise_1` directory.
 +
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 cd /home/lab-user/demos/eda_ocp/exercise_1
 ----
 +
 . Create a namespace to host the RocketChat app
 +
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 oc new-project rocketchat
 ----
 +
 . Install the RocketChat App via the `app.yml` file within the exercise_1 directory.
 +
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 $ oc create -f app.yml
 ----
@@ -407,7 +410,7 @@ $ oc create -f app.yml
 . Head toward your browser with the Ansible Automation Platform dashboard and login (if not already). Within the dashboard, head to `Views->Jobs` and you will see the `EDA-OpenShift-Exercise1` job is launched and running.
 . Once you see the Ansible Job has completed successfully, verify the snapshot has been created. On the bottom terminal window, run the command:
 +
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 oc get volumesnapshot -n rocketchat
 ----
@@ -435,6 +438,7 @@ certificate is used.
 
 To get the Rocket Chat URL, within the bottom terminal:
 
+[{format_cmd_exec2}]
 ----
 oc get routes
 ----
@@ -469,13 +473,13 @@ we will be using it to trigger our next event relating SSL management.
 
 To remove:
  
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 cd /home/lab-user/demos/eda_ocp/exercise_1/
 ----
 
 
-[{format_cmd_exec}]
+[{format_cmd_exec2}]
 ----
 oc delete -f app.yml
 ----
