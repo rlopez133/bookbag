@@ -208,6 +208,8 @@ Follow these steps to modify the example rulebook:
 
 . Copy the example rulebook to a file named `exercise1-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_1`
 +
+image::images/vi-edit.gif[]
++
 [NOTE]
 ====
 Using the `vi` editor, to ensure that the formating of the pasted content is
