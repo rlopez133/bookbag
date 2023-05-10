@@ -115,7 +115,7 @@ Follow these steps to modify the example rulebook:
 
 . Copy the example rulebook to a file named `exercise3-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_3` directory.
 +
-image::images/vi-edit.gif[link="images/vi-edit.gif"]
+image::images/vi-edit.gif[link="images/vi-edit.gif",window="_blank"]
 +
 [NOTE]
 ====

@@ -175,7 +175,7 @@ Follow these steps to modify the example rulebook:
 
 . Copy the example rulebook to a file named `exercise2-rulebook.yml` within the `/home/lab-user/demos/eda_ocp/exercise_2` directory.
 +
-image::images/vi-edit.gif[link="images/vi-edit.gif"]
+image::images/vi-edit.gif[link="images/vi-edit.gif",window="_blank"]
 +
 [NOTE]
 ====
@@ -403,7 +403,7 @@ $ oc get routes
 +
 . Using the Route URL, head to your browser and copy paste the link provided. You should now notice the Rocket Chat application has a proper SSL certificate which can be identified with the lock icon.
 +
-image::images/rocketchat_secure.png[link="images/rocketchat_secure.png"]
+image::images/rocketchat_secure.png[link="images/rocketchat_secure.png",window="_blank"]
 +
 . Congratulations! You now have completed Exercise 2 of applying properly signed certificates to applications created within OpenShift.
 
