@@ -282,7 +282,7 @@ cd /home/lab-user/demos/eda_ocp/
 ----
 podman images
 ----
-
++
 ----
 REPOSITORY                        TAG         IMAGE ID      CREATED      SIZE
 quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
