@@ -315,7 +315,7 @@ cd /mnt/exercise_2
 +
 [{format_cmd_copy}]
 ----
-ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_admin_token}
+ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_token}
 ----
 +
 ----
@@ -359,7 +359,7 @@ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 +
 [{format_cmd_copy}]
 ----
-oc login --token={openshift_token} --server={openshift_api_url}
+oc login --token={openshift_bearer_token} --server={openshift_api_url}
 ----
 +
 . Within the Git repository, access the `/home/lab-user/demos/eda_ocp/exercise_2` directory.
