@@ -1,12 +1,15 @@
-:bastion_ssh_user_name: %bastion_ssh_user_name%
 :bastion_public_hostname: %bastion_public_hostname%
+:bastion_ssh_password: %bastion_ssh_password%
+:bastion_ssh_password: %bastion_ssh_password%
+:bastion_ssh_user_name: %bastion_ssh_user_name%
 :aap_controller_web_url: %aap_controller_web_url%
 :aap_controller_admin_user: %aap_controller_admin_user%
 :aap_controller_admin_password: %aap_controller_admin_password%
-:aap_controller_admin_token: %aap_controller_admin_token%
+:aap_controller_token: %aap_controller_token%
 :openshift_api_url: %openshift_api_url%
-:openshift_token: %openshift_token%
-:format_cmd_exec: source,options="nowrap",,role="copy",subs="{markup-in-source}"
+:openshift_bearer_token: %openshift_bearer_token%
+:format_cmd_copy: source,options="nowrap",role="copy",subs="verbatim,attributes,quotes"
+:format_cmd_output: bash,options="nowrap",subs="verbatim,attributes,quotes"
 
 == Configuring SSL Management with Ansible Rulebooks
 
@@ -158,7 +161,7 @@ In this section, you will be provided with an example rulebook. Your task is to
 modify the example rulebook to run the Ansible Job Template
 `EDA-OpenShift-Exercise2` when a `Route` gets created.
 
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 .Example Rulebook
 ----
 - name: Example Rulebook
@@ -251,14 +254,14 @@ Otherwise continue with the steps as provided to create a new container.
 
 . As the `lab-user` within your bastion host, change directory to the Git repository demos folder
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 cd /home/lab-user/demos/eda_ocp/
 ----
 +
 . Capture the image ID of the Ansible Rulebook image
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 podman images
 ----
@@ -270,14 +273,14 @@ quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 +
 . Start the ansible-rulebook container and access it.
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 ddab79939a21 /bin/bash
 ----
 +
 . Within the ansible-rulebook container, run the `setup.sh`
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 (app-root) (app-root) ./setup.sh
 ----
@@ -292,9 +295,9 @@ OpenShift cluster.
 +
 . Login to your OpenShift cluster via
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
-oc login --token={openshift_token} --server={openshift_api_url}
+oc login --token={openshift_bearer_token} --server={openshift_api_url}
 ----
 +
 [NOTE]
@@ -304,13 +307,13 @@ Accept the Use insecure connections check.
 +
 . Change to the `exercise_2` directory
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 cd /mnt/exercise_2
 ----
 . Run your Ansible Rulebook (`exercise2-rulebook.yml`) with your Ansible automation controller credentials
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 ansible-rulebook -i inventory --rulebook exercise2-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_admin_token}
 ----
@@ -347,35 +350,35 @@ If your bottom terminal window is already logged into the bastion host, steps
 
 . Within the bottom terminal window, ssh into the bastion host.
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 +
 . Login using your token within this new terminal window.
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 oc login --token={openshift_token} --server={openshift_api_url}
 ----
 +
 . Within the Git repository, access the `/home/lab-user/demos/eda_ocp/exercise_2` directory.
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 cd /home/lab-user/demos/eda_ocp/exercise_2
 ----
 +
 . Switch to the rocketchat namespace previously created.
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 oc project rocketchat
 ----
 +
 . Install the RocketChat App via the `app.yml` file
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 oc create -f app.yml
 ----
@@ -401,7 +404,7 @@ y created Route::Patch a Route finished, active actions 0
 . Once you see the Ansible Job has completed successfully, verify the Route
 contains the Let's Encrypt certificate.
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 $ oc get routes
 ----
