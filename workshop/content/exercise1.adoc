@@ -114,7 +114,7 @@ The Ansible playbook contains four tasks:
 
 * The fourth task prints the name and namespace of each VolumeSnapshot retrieved in the previous task using the `ansible.builtin.debug` module
 
-Below you'll find a flow diagram representation of the Ansible Playbook and the
+Below you'll find a flow chart representation of the Ansible Playbook and the
 Ansible Playbook itself.
 
 .Ansible playbook flowchart
@@ -483,7 +483,7 @@ the Rocket Chat application via the use of proper SSL certificates.
 == Cleanup Rocket Chat App
 
 As we will be using the RocketChat App for the next exercise, lets remove it as
-we will be using it to trigger our next event relating SSL management.
+we will be using it to trigger our next event relating to SSL management.
 
 To remove:
  
