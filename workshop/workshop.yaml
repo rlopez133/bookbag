@@ -1,9 +1,8 @@
 ---
-name: Bookbag Template
+name: "Event Driven Ansible with Red Hat OpenShift"
 modules:
   activate:
     - overview
     - exercise1
     - exercise2
     - exercise3
-    - review

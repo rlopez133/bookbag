@@ -4,13 +4,10 @@ modules:
     name: Overview
     exit_sign: Continue
   exercise1:
-    name: Exercise 1
+    name: "Exercise 1: Snapshot Creation"
     exit_sign: Continue
   exercise2:
-    name: Exercise 2
+    name: "Exercise 2: SSL Management"
     exit_sign: Continue
   exercise3:
-    name: Exercise 3
-    exit_sign: Continue
-  review:
-    name: Review
+    name: "Exercise 3: Setting Resource Quotas"
