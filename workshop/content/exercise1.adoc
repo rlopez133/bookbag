@@ -1,13 +1,14 @@
-:ssh_command: "ssh lab-user@{bastion_public_hostname}"
-:ssh_password: {bastion_ssh_password}
+:bastion_public_hostname: %bastion_public_hostname%
+:bastion_ssh_password: %bastion_ssh_password%
+:bastion_ssh_password: %bastion_ssh_password%
+:bastion_ssh_user_name: %bastion_ssh_user_name%
 :aap_controller_web_url: %aap_controller_web_url%
 :aap_controller_admin_user: %aap_controller_admin_user%
 :aap_controller_admin_password: %aap_controller_admin_password%
-:aap_controller_admin_token: %aap_controller_admin_token%
+:aap_controller_token: %aap_controller_token%
 :openshift_api_url: %openshift_api_url%
-:openshift_token: %openshift_token%
-:format_cmd_exec: source,options="nowrap",role="copy",subs="verbatim,attributes,quotes"
-:format_cmd_exec2: source,options="nowrap",role="copy",subs="verbatim,attributes,quotes"
+:openshift_bearer_token: %openshift_bearer_token%
+:format_cmd_copy: source,options="nowrap",role="copy",subs="verbatim,attributes,quotes"
 :format_cmd_output: bash,options="nowrap",subs="verbatim,attributes,quotes"
 
 == Introduction to Ansible Rulebooks
@@ -33,16 +34,16 @@ controller that creates a PVC Snapshot.
 
 Using the bastion host credentials, `ssh` into the host on both terminals:
 
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
-%ssh_command%
+ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 
 The password to accesss the bastion host:
 
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
-%ssh_password%
+{bastion_ssh_password}
 ----
 
 === Git repository
@@ -51,7 +52,7 @@ With access to the bastion host, on the top terminal,  clone the Git repository
 with the exercises for the lab. They are located under
 https://github.com/rlopez133/demos
 
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 git clone https://github.com/rlopez133/demos
 ----
@@ -67,7 +68,7 @@ directory. There is a folder associated for each exercise.
 Within the bastion host, on the top terminal, pull the container image for the
 Ansible Rulebook via:
 
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 podman pull quay.io/ansible/ansible-rulebook:v0.12.0
 ----
@@ -192,7 +193,7 @@ In this section, you will be provided with an example Ansible Rulebook. Your
 task is to modify the example rulebook to run the Ansible Job Template
 `EDA-OpenShift-Exercise1` when a `PersistentVolumeClaim` gets created.
 
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 .Example Rulebook
 ----
 - name: Example Rulebook
@@ -278,14 +279,14 @@ and make some slight modifications within the container.
 
 . As the `lab-user` within your bastion host, on the top terminal, change directory to the Git repository demos folder
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 cd /home/lab-user/demos/eda_ocp/
 ----
 +
 . Capture the image ID of the Ansible Rulebook image
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 podman images
 ----
@@ -297,7 +298,7 @@ quay.io/ansible/ansible-rulebook  v0.12.0     ddab79939a21  13 days ago  1.68 GB
 +
 . Start the ansible-rulebook container and access it.
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 podman run -it --rm -v "$(pwd):/mnt:Z" --workdir /mnt --user 0 ddab79939a21 /bin/bash
 ----
@@ -310,7 +311,7 @@ the podman images command.
 +
 . Within the ansible-rulebook container, run the `setup.sh`
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 (app-root) (app-root) ./setup.sh
 ----
@@ -325,7 +326,7 @@ OpenShift cluster.
 +
 . Login to your OpenShift cluster via
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 oc login --token={openshift_bearer_token} --server={openshift_api_url}
 ----
@@ -337,13 +338,13 @@ Accept the Use insecure connections check.
 +
 . Change to the `exercise_1` directory
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 cd /mnt/exercise_1
 ----
 . Run your Ansible Rulebook (`exercise1-rulebook.yml`) with your AAP controller credentials
 +
-[{format_cmd_exec}]
+[{format_cmd_copy}]
 ----
 ansible-rulebook -i inventory --rulebook exercise1-rulebook.yml --verbose --controller-url {aap_controller_web_url} --controller-token {aap_controller_token}
 ----
@@ -377,35 +378,35 @@ Now, let's go through the steps to deploy the Rocket Chat application.
 
 . Within the bottom terminal window, ssh into the bastion host if not already.
 +
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 +
 . Login using your token within this new terminal window.
 +
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 oc login --token={openshift_bearer_token} --server={openshift_api_url}
 ----
 +
 . Within the Git repository, access the `/home/lab-user/demos/eda_ocp/exercise_1` directory.
 +
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 cd /home/lab-user/demos/eda_ocp/exercise_1
 ----
 +
 . Create a namespace to host the RocketChat app
 +
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 oc new-project rocketchat
 ----
 +
 . Install the RocketChat App via the `app.yml` file within the exercise_1 directory.
 +
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 $ oc create -f app.yml
 ----
@@ -423,7 +424,7 @@ $ oc create -f app.yml
 . Head toward your browser with the Ansible Automation Platform dashboard and login (if not already). Within the dashboard, head to `Views->Jobs` and you will see the `EDA-OpenShift-Exercise1` job is launched and running.
 . Once you see the Ansible Job has completed successfully, verify the snapshot has been created. On the bottom terminal window, run the command:
 +
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 oc get volumesnapshot -n rocketchat
 ----
@@ -451,7 +452,7 @@ protocol is used.
 
 To get the Rocket Chat URL, within the bottom terminal:
 
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 oc get routes
 ----
@@ -491,13 +492,13 @@ we will be using it to trigger our next event relating to SSL management.
 
 To remove:
  
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 cd /home/lab-user/demos/eda_ocp/exercise_1/
 ----
 
 
-[{format_cmd_exec2}]
+[{format_cmd_copy2}]
 ----
 oc delete -f app.yml
 ----
