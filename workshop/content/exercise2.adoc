@@ -10,9 +10,14 @@
 
 == Configuring SSL Management with Ansible Rulebooks
 
-In this exercise, you will create an Ansible Rulebook that triggers an Ansible
-Job within automation controller when a Route to an OpenShift application is
-created.
+In this exercise, you'll set up an Ansible Rulebook that kicks off an Ansible
+Job inside the automation controller every time a new Route to an OpenShift
+application is created.
+
+The goal is to familiarize yourself with automating the process of securing
+Routes. You'll take Routes that were first created using the HTTP protocol or
+with a self-signed certificate, and learn how to switch them over to using a
+properly signed SSL certificate for better security.
 
 You will work with an Ansible playbook that performs the following tasks:
 
@@ -401,7 +406,14 @@ contains the Let's Encrypt certificate.
 $ oc get routes
 ----
 +
-. Using the Route URL, head to your browser and copy paste the link provided. You should now notice the Rocket Chat application has a proper SSL certificate which can be identified with the lock icon.
+----
+NAME          HOST/PORT                                                                PATH   SERVICES      PORT
+ TERMINATION   WILDCARD
+rocket-chat   rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com          rocket-chat   3000
+               None
+----
++
+. Using the Route URL, head to your browser and copy paste the link provided, e.g. `https://rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com`. You should now notice the Rocket Chat application has a proper SSL certificate which can be identified with the lock icon.
 +
 image::images/rocketchat_secure.png[link="images/rocketchat_secure.png",window="_blank"]
 +

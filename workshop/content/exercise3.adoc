@@ -270,7 +270,14 @@ e": "EDA-OpenShift-Exercise3", "organization": "Default"}}}], "enabled": true}}]
 2023-05-09 16:31:40,011 - root - INFO - Running k8s eda source
 ----
 
-//TODO create setps to trigger Rulebook and fix output
+
+== Triggering the Rulebook
+
+In this section, create the namespace, `eda` which will trigger the Ansible
+Rulebook and the Ansible Job to set the proper resource quotas for the `eda`
+namespace.
+
+From the bottom terminal window, 
 
 . Create a namespace
 +
@@ -313,6 +320,7 @@ resource quotas.
 
 Let's first create a simple pod manifest file named test-pod.yml:
 
+[{format_cmd_exec}]
 ----
 ---
 apiVersion: v1

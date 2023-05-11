@@ -371,7 +371,7 @@ For this exercise, we won't focus on using Rocket Chat itself, but rather on how
 its deployed components can trigger our Ansible Rulebook. By monitoring for a
 specific event, such as the creation of a Persistent Volume Claim, the Rocket
 Chat deployment will initiate this event, causing our Ansible Rulebook to launch
-the Ansible Job Template 'EDA-OpenShift-Exercise1'.
+the Ansible Job Template `EDA-OpenShift-Exercise1`.
 
 Now, let's go through the steps to deploy the Rocket Chat application.
 
@@ -446,8 +446,8 @@ requirements for your snapshots.
 == Accessing the Rocket Chat Application
 
 Prior to moving to the following exercise, I wanted to point out that when you
-go to the Rocket Chat URL within your web browser, notice how a self-signed
-certificate is used. 
+go to the Rocket Chat URL within your web browser, notice how the `HTTP`
+protocol is used.
 
 To get the Rocket Chat URL, within the bottom terminal:
 
@@ -464,15 +464,19 @@ rocket-chat   rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc
 ----
 
 Via your browser access the Rocket Chat URL, e.g.
-`rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com`, and
-notice how the Rocket Chat App uses a self-signed certificate.
+`http://rocket-chat-rocketchat.apps.cluster-58x8n.58x8n.sandbox514.opentlc.com`, and
+notice how the Rocket Chat App uses the `HTTP` protocol` (an unsecure
+connection).
+
+NOTE: Ensure to modify the link based on the route URL in your OpenShift cluster.
 
 .RocketChat app not secure
 image::images/rocketchat_not_secure.png[link="images/rocketchat_not_secure.png",window="_blank"]
 
 [NOTE]
 ====
-If the Rocket Chat application doesn't immediately load, it may still completing
+If the Rocket Chat application doesn't immediately load and displays a
+"Application is not available", it may still completing
 the installation process.
 ====
 
@@ -497,3 +501,14 @@ cd /home/lab-user/demos/eda_ocp/exercise_1/
 ----
 oc delete -f app.yml
 ----
+
+== Summary
+
+In this exercise, you gained insights on how to create an Ansible Rulebook that
+triggers an Ansible Job for creating a PVC (Persistent Volume Claim) snapshot.
+
+You learned how to:
+
+. Write an Ansible Rulebook to listen for certain events and subsequently trigger an Ansible Job.
+. Understand the provided Ansible playbook, which helps in automating the process of creating a PVC snapshot.
+. Deploy an application (RocketChat) that triggers an event being watched by an Ansible Rulebook.
