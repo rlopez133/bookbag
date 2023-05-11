@@ -114,6 +114,12 @@ The Ansible playbook contains four tasks:
 
 * The fourth task prints the name and namespace of each VolumeSnapshot retrieved in the previous task using the `ansible.builtin.debug` module
 
+Below you'll find a flow diagram representation of the Ansible Playbook and the
+Ansible Playbook itself.
+
+.Ansible Playbook Flowdiagram
+image::images/images/exercise1_flow.png[link="images/exercise1_flow.png",window="_blank"]
+
 
 .Ansible PVC Playbook
 ----
