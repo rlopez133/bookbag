@@ -84,11 +84,15 @@ for each of the exercises under `Resources->Templates`. When an Ansible Rulebook
 triggers due to an event, you will be able to see the Job Template running
 within the `Views->Jobs` section of the Ansible Automation Platform dashboard.
 
-URL: {aap_controller_web_url}
+[%autowidth.stretch,width=70%,cols="^.^a,^.^a",options="header"]
+|===
+| *Controller Console URL:* | %aap_controller_web_url%
+| *Admin Username:* | %aap_controller_admin_user%
+| *Admin Password:* | %aap_controller_admin_password%
+| *Controller Token:* | %aap_controller_token%
+|===
 
-username: {aap_controller_admin_user}
-
-password: {aap_controller_admin_password}
+image::images/templates_jobs.png[link="images/templates_jobs.png",window="_blank"]
 
 == Understanding the Provided Ansible Playbook
 
@@ -422,6 +426,9 @@ $ oc create -f app.yml
 ----
 +
 . Head toward your browser with the Ansible Automation Platform dashboard and login (if not already). Within the dashboard, head to `Views->Jobs` and you will see the `EDA-OpenShift-Exercise1` job is launched and running.
++
+image::images/job.png[link="images/job.png",window="_blank"]
++
 . Once you see the Ansible Job has completed successfully, verify the snapshot has been created. On the bottom terminal window, run the command:
 +
 [{format_cmd_copy}]
