@@ -6,7 +6,7 @@
 :my_deep_var_dots: {my.deep.var}
 :bookbag-link: https://bookbag-{guid}-bookbag.apps.shared-410.openshift.redhatworkshops.io
 
-== Ansible Automation Platfrom 2 EDA on OpenShift
+== Ansible Automation Platform 2 EDA on OpenShift
 
 Welcome to the Ansible Automation Platform 2 Event Driven Ansible (EDA) on
 OpenShift Lab. This comprehensive lab experience is designed to provide you with
